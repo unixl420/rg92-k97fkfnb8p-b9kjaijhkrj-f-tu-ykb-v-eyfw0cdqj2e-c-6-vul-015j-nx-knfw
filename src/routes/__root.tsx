@@ -17,15 +17,17 @@ export const Route = createRootRoute({
       {
         name: "description",
         content:
-          `${period.label} wholesale research peptide price list for China Biotech Group and Shenzhen Peptide Biotechnology. Volume pricing from 20% to 60% below retail, with independent lab testing and written quality and shipping guarantees.`,
+          "Factory-direct research peptides since 2010. 100+ compounds, volume pricing 20–60% below retail, in-house QC, independent lab testing, and written quality and shipping guarantees.",
       },
       { name: "theme-color", content: "#0B0D12" },
     ],
     links: [
-      { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+      { rel: "icon", href: "/favicon.ico", sizes: "48x48" },
+      { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32.png" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
+      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       { rel: "stylesheet", href: appCss },
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
-      { rel: "apple-touch-icon", href: "/__grok/icon-180.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {

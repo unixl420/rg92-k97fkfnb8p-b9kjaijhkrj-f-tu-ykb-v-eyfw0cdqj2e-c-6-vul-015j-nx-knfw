@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as GuaranteesRouteImport } from './routes/guarantees'
 import { Route as PriceListRouteImport } from './routes/price-list'
 import { Route as PrintRouteImport } from './routes/print'
@@ -19,6 +20,11 @@ import { Route as ProductSlugRouteImport } from './routes/product.$slug'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuaranteesRoute = GuaranteesRouteImport.update({
@@ -49,6 +55,7 @@ const ProductSlugRoute = ProductSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
   '/guarantees': typeof GuaranteesRoute
   '/price-list': typeof PriceListRoute
   '/print': typeof PrintRoute
@@ -57,6 +64,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
   '/guarantees': typeof GuaranteesRoute
   '/price-list': typeof PriceListRoute
   '/print': typeof PrintRoute
@@ -66,6 +74,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
   '/guarantees': typeof GuaranteesRoute
   '/price-list': typeof PriceListRoute
   '/print': typeof PrintRoute
@@ -75,13 +84,26 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/guarantees' | '/price-list' | '/print' | '/quote' | '/product/$slug'
+    | '/'
+    | '/contact'
+    | '/guarantees'
+    | '/price-list'
+    | '/print'
+    | '/quote'
+    | '/product/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/guarantees' | '/price-list' | '/print' | '/quote' | '/product/$slug'
+    | '/'
+    | '/contact'
+    | '/guarantees'
+    | '/price-list'
+    | '/print'
+    | '/quote'
+    | '/product/$slug'
   id:
     | '__root__'
     | '/'
+    | '/contact'
     | '/guarantees'
     | '/price-list'
     | '/print'
@@ -91,6 +113,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ContactRoute: typeof ContactRoute
   GuaranteesRoute: typeof GuaranteesRoute
   PriceListRoute: typeof PriceListRoute
   PrintRoute: typeof PrintRoute
@@ -105,6 +128,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guarantees': {
@@ -147,6 +177,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ContactRoute: ContactRoute,
   GuaranteesRoute: GuaranteesRoute,
   PriceListRoute: PriceListRoute,
   PrintRoute: PrintRoute,

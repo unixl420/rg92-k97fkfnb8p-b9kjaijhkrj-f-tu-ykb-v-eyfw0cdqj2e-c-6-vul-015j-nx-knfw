@@ -1,5 +1,7 @@
 import { FlaskConical, Search, ShieldCheck } from "lucide-react";
+import { AssayPills } from "@/components/assay-pills";
 import { CategoryTable } from "@/components/category-table";
+import { ContactUsButton } from "@/components/contact-us-button";
 import { GuaranteeStrip } from "@/components/guarantee-strip";
 import { MobileCategoryList } from "@/components/mobile-price-card";
 import { VolumeModel } from "@/components/volume-model";
@@ -49,26 +51,45 @@ export function PriceListBody({
   });
   const specialGroups = groupByName(specials);
   const matchCount = grouped.reduce((n, g) => n + groupByName(g.rows).length, 0);
+  const totalCompounds = groupByName(PRODUCTS).length;
 
   return (
     <article id="print-root" className="mx-auto max-w-6xl px-[26px] pb-20 pt-6 lg:px-8">
       <header className="print-page pb-6">
-        <div className="flex items-center gap-4">
-            <img
-              src="/brand/cbp.png"
-              alt="China Biotech Group"
-              draggable={false}
-              onContextMenu={(e) => e.preventDefault()}
-              className="pointer-events-none size-[120px] select-none object-contain sm:size-[150px]"
-            />
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-cobalt">
-                {LIST_META.group}
-              </p>
-              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">{LIST_META.title}</h1>
-              <p className="mt-1 text-sm text-ink-soft">Last updated {LIST_META.month}</p>
+        <div className="flex flex-col items-center text-center sm:flex-row sm:items-center sm:gap-4 sm:text-left">
+          <img
+            src="/brand/cbp.png"
+            alt="China Biotech Group"
+            draggable={false}
+            onContextMenu={(e) => e.preventDefault()}
+            className="pointer-events-none -mb-3 size-[120px] shrink-0 select-none object-contain sm:mb-0 sm:size-[150px]"
+          />
+          <div className="min-w-0 w-full sm:flex-1">
+            <div className="flex items-center justify-between gap-4">
+              <div className="min-w-0 w-full sm:w-auto">
+                <p className="hidden text-sm font-semibold uppercase tracking-wide text-cobalt sm:block">
+                  {LIST_META.group}
+                </p>
+                <h1 className="text-3xl font-bold tracking-tight sm:mt-1 sm:text-4xl">
+                  <span className="block font-semibold text-ink/40">{LIST_META.monthName}</span>
+                  Peptide Price List
+                </h1>
+                <p className="mt-2 text-sm text-ink-soft">
+                  <span className="block sm:inline">Last updated {LIST_META.month}</span>
+                  <span aria-hidden="true" className="mx-2 hidden text-muted sm:inline">
+                    ·
+                  </span>
+                  <span className="mt-0.5 block sm:mt-0 sm:inline">Prices in USD</span>
+                </p>
+              </div>
+              <ContactUsButton tone="on-paper" className="no-print hidden shrink-0 sm:inline-flex" />
             </div>
           </div>
+        </div>
+        <ContactUsButton
+          tone="on-paper"
+          className="no-print mt-5 flex w-full justify-center sm:hidden"
+        />
       </header>
 
       <section className="print-page mb-8 max-w-4xl text-base leading-relaxed text-ink">
@@ -98,8 +119,21 @@ export function PriceListBody({
         </p>
       </section>
 
+      <div className="print-page mt-2">
+        <GuaranteeStrip />
+      </div>
+
+      <div className="print-page mt-6">
+        <VolumeModel highlightTier={highlightTier} onSelect={printable ? undefined : onHighlight} />
+        <p className="mt-3 text-base text-ink-soft">
+          Volume prices apply to each <strong className="font-semibold text-ink">individual SKU</strong>.
+          Only kits of the same product and the same strength count toward a better price. Different
+          products are not added together.
+        </p>
+      </div>
+
       {printable ? null : (
-        <div className="no-print mb-8">
+        <div className="no-print mb-2 mt-8">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -107,9 +141,12 @@ export function PriceListBody({
             }}
           >
             <label className="block" htmlFor="peptide-search">
-              <span className="flex items-center gap-2 text-base font-semibold">
+              <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-base font-semibold">
                 <Search className="size-5" />
                 Find a peptide
+                <span className="font-medium text-ink-soft">
+                  · {totalCompounds} total
+                </span>
               </span>
             </label>
             <input
@@ -142,55 +179,14 @@ export function PriceListBody({
         </div>
       )}
 
-      <div className="print-page mt-2">
-        <GuaranteeStrip />
-      </div>
-
-      <div className="print-page mt-6">
-        <VolumeModel highlightTier={highlightTier} onSelect={printable ? undefined : onHighlight} />
-        <p className="mt-3 text-base text-ink-soft">
-          Volume prices apply to each <strong className="font-semibold text-ink">individual SKU</strong>.
-          Only kits of the same product and the same strength count toward a better price. Different
-          products are not added together.
-        </p>
-      </div>
-
       {printable || !onSection ? null : (
         <div className="no-print mt-8">
           <p className="text-base font-semibold">Browse by section</p>
-          <p className="mt-1 text-sm text-ink-soft">Tap a section to view it. All is selected by default.</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <SectionPill
-              label="All"
-              active={section === "all"}
-              accent="#1b4f8a"
-              onClick={() => {
-                onSection("all");
-                document.getElementById("price-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            />
-            {CATEGORIES.map((cat) => (
-              <SectionPill
-                key={cat.id}
-                label={cat.short}
-                active={section === cat.id}
-                accent={cat.accent}
-                onClick={() => {
-                  onSection(cat.id);
-                  document.getElementById("price-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-                }}
-              />
-            ))}
-            <SectionPill
-              label="Special order"
-              active={section === "special-order"}
-              accent="#1b4f8a"
-              onClick={() => {
-                onSection("special-order");
-                document.getElementById("price-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            />
-          </div>
+          <p className="mt-1 hidden text-sm text-ink-soft md:block">
+            Tap a section to view it. All is selected by default.
+          </p>
+          <p className="mt-1 text-sm text-ink-soft md:hidden">Swipe to choose a section.</p>
+          <SectionPills section={section} onSection={onSection} />
         </div>
       )}
 
@@ -244,13 +240,22 @@ export function PriceListBody({
             Available via special order only
           </p>
           <h2 className="mt-2 text-2xl font-bold sm:text-3xl">
-            Minimum order quantity 100 kits. Contact us for custom pricing.
+            Minimum order quantity 100 kits.{" "}
+            <a
+              href={LIST_META.contactPage}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cobalt underline"
+            >
+              Contact us
+            </a>{" "}
+            for custom pricing.
           </h2>
           <p className="mt-2 max-w-3xl text-base text-ink">
             Make-to-order items. Minimum 100 kits; pricing is quoted, not listed on the volume ladder.
             Ask your China Biotech Group representative for a factory quote.
           </p>
-          <p className="mt-2 text-sm text-ink-soft">quote · MOQ 100 kits · make-to-order</p>
+          <p className="sr-only">quote · MOQ 100 kits · make-to-order</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {specialGroups.map((group) => (
               <article key={group.name} className="rounded-lg border border-cobalt/20 bg-card px-[22px] py-4">
@@ -275,25 +280,79 @@ export function PriceListBody({
           to independent laboratories, including Janoshik, Freedom Diagnostics, and other accredited
           facilities. Customers are encouraged to commission their own assay. Should verified results
           fall below specification, we will refund the order or replace the batch. Public certificates
-          of analysis are available on request — please contact us.
+          of analysis are available on request.
         </p>
-        <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-          {[
-            "HPLC purity",
-            "Mass spectrometry identity",
-            "Karl Fischer water content",
-            "Related substances",
-            "Residual solvents",
-            "Micro & endotoxin",
-          ].map((item) => (
-            <li key={item} className="rounded-lg border border-line bg-paper-deep px-[22px] py-3.5 text-base font-medium">
-              {item}
-            </li>
-          ))}
-        </ul>
+        <AssayPills />
         <p className="mt-6 text-sm text-muted">{LIST_META.research}</p>
       </section>
     </article>
+  );
+}
+
+function sectionItems() {
+  return [
+    { id: "all", label: "All", accent: "#1b4f8a" },
+    ...CATEGORIES.map((cat) => ({ id: cat.id, label: cat.short, accent: cat.accent })),
+    { id: "special-order", label: "Special order", accent: "#1b4f8a" },
+  ];
+}
+
+function SectionPills({
+  section,
+  onSection,
+}: {
+  section: string;
+  onSection: (id: string) => void;
+}) {
+  const items = sectionItems();
+  const split = Math.ceil(items.length / 2);
+  const go = (id: string) => {
+    onSection(id);
+    document.getElementById("price-results")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  return (
+    <>
+      <div className="-mx-[26px] mt-3 md:hidden">
+        <div className="section-chip-row overflow-x-auto px-[26px] pb-1">
+          <div className="flex w-max flex-col gap-2">
+            <div className="flex gap-2">
+              {items.slice(0, split).map((item) => (
+                <SectionPill
+                  key={item.id}
+                  label={item.label}
+                  active={section === item.id}
+                  accent={item.accent}
+                  onClick={() => go(item.id)}
+                />
+              ))}
+            </div>
+            <div className="flex gap-2">
+              {items.slice(split).map((item) => (
+                <SectionPill
+                  key={item.id}
+                  label={item.label}
+                  active={section === item.id}
+                  accent={item.accent}
+                  onClick={() => go(item.id)}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mt-3 hidden flex-wrap gap-2 md:flex">
+        {items.map((item) => (
+          <SectionPill
+            key={item.id}
+            label={item.label}
+            active={section === item.id}
+            accent={item.accent}
+            onClick={() => go(item.id)}
+          />
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -313,7 +372,7 @@ function SectionPill({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className="min-h-11 rounded-full border px-4 text-sm font-semibold"
+      className="h-10 shrink-0 snap-start rounded-full border px-3.5 text-sm font-semibold md:min-h-11 md:px-4"
       style={
         active
           ? { backgroundColor: accent, borderColor: accent, color: "#fff" }

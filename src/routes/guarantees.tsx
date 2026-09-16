@@ -1,22 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Check, FlaskConical, ShieldCheck, Truck } from "lucide-react";
 import { GuaranteeStrip } from "@/components/guarantee-strip";
+import { SiteFooter } from "@/components/site-footer";
 import { LIST_META } from "@/lib/catalog";
 
 export const Route = createFileRoute("/guarantees")({ component: GuaranteesPage });
 
 const QC = [
-  { title: "HPLC purity", body: "Assay of the target peptide against specification before release." },
-  { title: "Mass spectrometry identity", body: "Confirms the correct molecular mass of the lot." },
-  { title: "Karl Fischer water", body: "Water content of lyophilized material, lot by lot." },
-  { title: "Related substances", body: "Impurity profile reviewed against internal limits." },
-  { title: "Residual solvents", body: "Solvent residues screened prior to release." },
-  { title: "Micro & endotoxin", body: "Microbial and endotoxin checks on every batch." },
+  { title: "HPLC Purity", body: "Assay of the target peptide against specification before release." },
+  { title: "Mass Spectrometry Identity", body: "Confirms the correct molecular mass of the lot." },
+  { title: "Karl Fischer Water", body: "Water content of lyophilized material, lot by lot." },
+  { title: "Related Substances", body: "Impurity profile reviewed against internal limits." },
+  { title: "Residual Solvents", body: "Solvent residues screened prior to release." },
+  { title: "Micro & Endotoxin", body: "Microbial and endotoxin checks on every batch." },
 ];
 
 function GuaranteesPage() {
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
       <main className="mx-auto max-w-3xl px-[26px] py-10 lg:px-8">
         <Link to="/" className="text-base font-medium text-cobalt underline">
           Back to the price list
@@ -77,6 +78,7 @@ function GuaranteesPage() {
 
         <p className="mt-10 text-sm text-muted">{LIST_META.research}</p>
       </main>
+      <SiteFooter />
     </div>
   );
 }

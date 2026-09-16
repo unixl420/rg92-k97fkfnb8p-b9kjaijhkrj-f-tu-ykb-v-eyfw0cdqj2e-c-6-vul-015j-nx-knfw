@@ -19,14 +19,27 @@ export function CategoryTable({
           key={group.name}
           className="overflow-hidden rounded-xl border border-line print:break-inside-avoid"
         >
-          <div className="px-[26px] py-3.5 text-white" style={{ backgroundColor: accent }}>
+          <div
+            className="flex flex-wrap items-center justify-between gap-2 px-[26px] py-3.5 text-white"
+            style={{ backgroundColor: accent }}
+          >
             <h3 className="text-lg font-bold">{group.name}</h3>
+            {group.items[0]?.headerNote ? (
+              <span className="shrink-0 rounded-full bg-paper/20 px-3 py-1 text-sm font-semibold">
+                {group.items[0].headerNote}
+              </span>
+            ) : null}
           </div>
           <div className="overflow-x-auto print:overflow-visible">
             <table className="w-full min-w-table border-collapse text-base print:min-w-0 print:text-sm">
               <thead>
                 <tr className="bg-paper-deep text-ink">
-                  <th className="px-[26px] py-3 text-left font-semibold text-ink/55">Strength</th>
+                  <th
+                    className="px-[26px] py-3 text-left font-semibold text-ink/55"
+                    style={{ borderBottom: `1px solid ${accent}33` }}
+                  >
+                    Strength
+                  </th>
                   {VOLUME_TIERS.map((tier) => (
                     <th
                       key={tier.id}
@@ -34,7 +47,10 @@ export function CategoryTable({
                         "px-4 py-3 text-right font-semibold tabular-nums",
                         highlightTier === tier.id && "text-white",
                       )}
-                      style={highlightTier === tier.id ? { backgroundColor: accent } : undefined}
+                      style={{
+                        borderBottom: `1px solid ${accent}33`,
+                        ...(highlightTier === tier.id ? { backgroundColor: accent } : {}),
+                      }}
                     >
                       <span className="block leading-tight">{tier.label}</span>
                       <span className="block text-xs font-semibold uppercase tracking-wider opacity-80">
@@ -48,7 +64,13 @@ export function CategoryTable({
               <tbody>
                 {group.items.map((p, i) => (
                   <tr key={p.id} className={i % 2 === 0 ? "bg-card" : "bg-paper-deep/80"}>
-                    <td className="px-[26px] py-3 font-semibold text-ink/55">
+                    <td
+                      className="px-[26px] py-3 font-semibold"
+                      style={{
+                        color: accent,
+                        borderTop: i === 0 ? undefined : `1px solid ${accent}26`,
+                      }}
+                    >
                       {p.pack}
                       {p.unitNote ? (
                         <span className="ml-2 text-sm font-normal text-muted">{p.unitNote}</span>
@@ -62,17 +84,25 @@ export function CategoryTable({
                               "px-4 py-3 text-right tabular-nums",
                               highlightTier === idx && "font-bold",
                             )}
-                            style={
-                              highlightTier === idx
+                            style={{
+                              borderTop: i === 0 ? undefined : `1px solid ${accent}26`,
+                              ...(highlightTier === idx
                                 ? { backgroundColor: `${accent}1a`, color: accent }
-                                : undefined
-                            }
+                                : {}),
+                            }}
                           >
                             {usd(price)}
                           </td>
                         ))
                       : VOLUME_TIERS.map((tier) => (
-                          <td key={tier.id} className="px-4 py-3 text-right text-sm" style={{ color: accent }}>
+                          <td
+                            key={tier.id}
+                            className="px-4 py-3 text-right text-sm"
+                            style={{
+                              color: accent,
+                              borderTop: i === 0 ? undefined : `1px solid ${accent}26`,
+                            }}
+                          >
                             —
                           </td>
                         ))}

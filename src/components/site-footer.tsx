@@ -1,49 +1,15 @@
-import { Link } from "@tanstack/react-router";
-import { LIST_META } from "@/lib/catalog";
+import { ContactUsButton } from "@/components/contact-us-button";
 
 export function SiteFooter() {
   return (
-    <footer className="no-print border-t border-line bg-paper text-ink">
-      <div className="mx-auto grid max-w-6xl gap-10 px-[26px] py-12 sm:grid-cols-3 lg:px-8">
+    <footer className="no-print bg-cobalt text-paper">
+      <div className="mx-auto flex max-w-6xl flex-col items-start justify-between gap-5 px-[26px] py-8 sm:flex-row sm:items-center lg:px-8">
         <div>
-          <p className="text-lg font-semibold">China Biotech Group</p>
-          <p className="mt-2 text-base leading-relaxed text-ink-soft">{LIST_META.research}</p>
+          <p className="text-sm font-bold uppercase tracking-wide text-paper/80">Talk to us</p>
+          <p className="mt-1 text-2xl font-semibold tracking-tight">Need a quote, COA, or a claim?</p>
+          <p className="mt-1 text-base text-paper/80">Contact us through our official channels.</p>
         </div>
-        <div>
-          <p className="text-sm font-bold uppercase tracking-wide text-muted">Sister companies</p>
-          <p className="mt-3 text-base text-ink-soft">
-            <a
-              href={LIST_META.companyUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold text-ink underline decoration-cobalt/40 underline-offset-2"
-            >
-              {LIST_META.company}
-            </a>{" "}
-            (“SPB”)
-            <br />
-            <a
-              href={LIST_META.sisterUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-bold text-ink underline decoration-cobalt/40 underline-offset-2"
-            >
-              {LIST_META.sister}
-            </a>{" "}
-            (“GPB” or “G”)
-          </p>
-        </div>
-        <div>
-          <p className="text-sm font-bold uppercase tracking-wide text-muted">Written guarantees</p>
-          <p className="mt-3 text-base leading-relaxed text-ink-soft">
-            Independent labs such as Janoshik, Freedom Diagnostics, and others on popular batches.
-            Full refund or a fresh replacement if results fall below our standard. Covered shipping
-            losses replaced or refunded.
-          </p>
-          <Link to="/guarantees" className="mt-4 inline-block text-base font-medium text-cobalt underline">
-            Read the full testing protocol
-          </Link>
-        </div>
+        <ContactUsButton tone="on-cobalt" className="w-full justify-center sm:w-auto" />
       </div>
     </footer>
   );

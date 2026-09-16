@@ -26,6 +26,7 @@ export type Product = {
   isNew?: boolean;
   excludeFromVolume?: boolean;
   unitNote?: string;
+  headerNote?: string;
 };
 
 export type Category = {
@@ -142,7 +143,7 @@ export const CATEGORIES: Category[] = [
     id: "support",
     label: "Reconstitution & Support Materials",
     short: "Support",
-    blurb: "Water and solvents used to dissolve a vial. These are not peptides and do not count toward volume pricing.",
+    blurb: "Water and solvents used to dissolve a vial. These are not peptides.",
     goal: "Lab support",
     tags: ["sterile water", "solvent", "reconstitute", "BAC water", "not a peptide"],
     accent: "#4a6275",
@@ -171,6 +172,7 @@ type Draft = {
   isNew?: boolean;
   excludeFromVolume?: boolean;
   unitNote?: string;
+  headerNote?: string;
 };
 
 function item(
@@ -220,7 +222,9 @@ const DRAFTS: Draft[] = [
   item("Dulaglutide", "10mg", "metabolic", volumeTiers(537), { isNew: true }),
   item("AOD9604", "5mg", "metabolic", [116, 101, 87, 73, 58]),
   item("AOD9604", "10mg", "metabolic", [244, 213, 183, 153, 122]),
-  item("Lemon Bottle", "10ml", "metabolic", [73, 63, 54, 45, 36], { unitNote: "Single 10ml bottle" }),
+  item("Lemon Bottle", "10ml", "metabolic", [73, 63, 54, 45, 36], {
+    headerNote: "Single 10ml bottle",
+  }),
   item("HGH Fragment 176-191", "1mg", "metabolic", [24, 21, 19, 15, 12]),
   item("HGH Fragment 176-191", "2mg", "metabolic", [34, 30, 25, 21, 18]),
   item("HGH Fragment 176-191", "5mg", "metabolic", [139, 122, 105, 87, 69]),
@@ -357,8 +361,8 @@ const DRAFTS: Draft[] = [
   item("CBL-514", "20mg", "fatloss", volumeTiers(309), { isNew: true }),
   item("L-Carnitine", "200mg", "fatloss", volumeTiers(27), { isNew: true }),
   item("L-Carnitine", "400mg", "fatloss", volumeTiers(35), { isNew: true }),
-  item("L-Carnitine", "600mg", "fatloss", [48, 42, 36, 31, 24], { unitNote: "10ml vials" }),
-  item("L-Carnitine", "1200mg", "fatloss", [58, 51, 44, 36, 30], { unitNote: "10ml vials" }),
+  item("L-Carnitine", "600mg", "fatloss", [48, 42, 36, 31, 24]),
+  item("L-Carnitine", "1200mg", "fatloss", [58, 51, 44, 36, 30]),
   item("Lipo-C", "10mg", "fatloss", [277, 243, 208, 174, 139]),
   item("5-Amino-1MQ", "5mg", "fatloss", [38, 34, 30, 24, 20]),
   item("Adipotide", "2mg", "fatloss", [63, 55, 47, 40, 32]),
@@ -374,9 +378,8 @@ const DRAFTS: Draft[] = [
   item("EPO", "3000iu", "muscle", [53, 46, 40, 33, 26]),
 
   item("Bacteriostatic Water", "3ml", "support", [9, 8, 7, 6, 4], { excludeFromVolume: true }),
-  item("Bacteriostatic Water", "10ml", "support", [22, 20, 16, 14, 11], {
+  item("Bacteriostatic Water", "Single 10ml Vial", "support", [22, 20, 16, 14, 11], {
     excludeFromVolume: true,
-    unitNote: "Single 10ml vial",
   }),
   item("Acetic Water", "3ml", "support", [7, 6, 4, 4, 3], { excludeFromVolume: true }),
   item("Sterile Water", "3ml", "support", [9, 8, 7, 6, 4], { excludeFromVolume: true }),
@@ -452,6 +455,7 @@ export function productMatches(product: Product, query: string): boolean {
     product.name,
     product.pack,
     product.unitNote ?? "",
+    product.headerNote ?? "",
     cat?.label ?? "",
     cat?.short ?? "",
     cat?.goal ?? "",
@@ -490,6 +494,9 @@ export const LIST_META = {
   get title() {
     return currentListPeriod().title;
   },
+  get monthName() {
+    return currentListPeriod().month;
+  },
   company: "Shenzhen Peptide Biotechnology Co., Ltd.",
   companyUrl: "https://www.shenzhenpeptide.com",
   group: "China Biotech Group",
@@ -504,11 +511,18 @@ export const LIST_META = {
   quality:
     "We encourage you to test your received batch at any reputable laboratory. Should independent results fall below specification, we will provide a full refund or a replacement batch. Further detail is below; contact us for a public COA.",
   shipping:
-    "If a shipment is lost, damaged, incomplete, or delayed by a covered customs issue, we will provide a full refund or a replacement shipment. Share the tracking number so we can open the case promptly. Contact us to file a claim.",
+    "If a shipment is lost, damaged, incomplete, or delayed by a covered customs issue, we will provide a full refund or a replacement shipment. Share the tracking number so we can open the case promptly, or contact us to file a claim.",
   volumeNote:
     "Volume prices apply to each individual SKU. Only kits of the same product and the same strength count toward a better price. Different products are not added together.",
   testing:
-    "Every lot is released only after in-house QC. Selected commercial lots are also submitted to independent laboratories, including Janoshik, Freedom Diagnostics, and other accredited facilities. Customers are encouraged to commission their own assay. Should verified results fall below specification, we will refund the order or replace the batch. Public certificates of analysis are available on request — please contact us.",
+    "Every lot is released only after in-house QC. Selected commercial lots are also submitted to independent laboratories, including Janoshik, Freedom Diagnostics, and other accredited facilities. Customers are encouraged to commission their own assay. Should verified results fall below specification, we will refund the order or replace the batch. Public certificates of analysis are available on request.",
   research:
     "For laboratory research use only. Not for human or veterinary use, not for diagnostic procedures, and not a drug, food, or cosmetic.",
+  contactEmail: "shenzhenpeptide@protonmail.com",
+  telegram: "shenzhen_peptide",
+  telegramUrl: "https://t.me/shenzhen_peptide",
+  contactPage: "https://www.shenzhenpeptide.com/contact",
+  address:
+    "6 Kefa Road, Science and Technology Park, Nanshan District, Shenzhen, Guangdong 518057",
+  addressZh: "广东省深圳市南山区科技园科发路6号 邮政编码：518057",
 };

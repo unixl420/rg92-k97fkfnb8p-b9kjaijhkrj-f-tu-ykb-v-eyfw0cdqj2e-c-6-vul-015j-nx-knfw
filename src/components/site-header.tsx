@@ -98,6 +98,14 @@ export function SiteHeader({
             >
               Testing
             </Link>
+            <a
+              href={LIST_META.contactPage}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md px-3 py-3 text-base text-ink-soft hover:bg-mist hover:text-ink"
+            >
+              Contact
+            </a>
           </nav>
         )}
 
@@ -162,6 +170,15 @@ export function SiteHeader({
             >
               Testing & guarantees
             </Link>
+            <a
+              href={LIST_META.contactPage}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md px-3 py-3 text-base"
+              onClick={() => setOpen(false)}
+            >
+              Contact us
+            </a>
           </nav>
         )}
         <div className="mt-3">

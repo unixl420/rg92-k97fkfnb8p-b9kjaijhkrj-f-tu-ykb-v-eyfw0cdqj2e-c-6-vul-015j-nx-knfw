@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { BackToTop } from "@/components/back-to-top";
 import { PriceListBody } from "@/components/price-list-body";
+import { SiteFooter } from "@/components/site-footer";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -20,6 +21,7 @@ function Home() {
         section={section}
         onSection={setSection}
       />
+      <SiteFooter />
       <BackToTop />
     </div>
   );

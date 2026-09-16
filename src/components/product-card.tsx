@@ -36,9 +36,6 @@ export function ProductCard({ product, tierIndex }: { product: Product; tierInde
           {product.specialOrder ? "Enquire" : "Add"}
         </Button>
       </div>
-      {product.excludeFromVolume ? (
-        <p className="mt-2 text-[11px] text-muted">Does not count toward volume tier</p>
-      ) : null}
     </article>
   );
 }
