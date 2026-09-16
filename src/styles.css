@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #142033;
+  --color-ink-soft: #3d4a5c;
+  --color-paper: #ffffff;
+  --color-paper-deep: #f3f6fa;
+  --color-mist: #e8eef6;
+  --color-line: #d5deea;
+  --color-cinnabar: #1b4f8a;
+  --color-cinnabar-deep: #143a66;
+  --color-cobalt: #1b4f8a;
+  --color-cobalt-deep: #143a66;
+  --color-fg: #142033;
+  --color-muted: #5a6778;
+  --color-border: #d5deea;
+  --color-ring: #1b4f8a;
+  --color-background: #ffffff;
+  --color-card: #ffffff;
+  --font-display: "Inter", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "Inter", monospace;
+  --radius-sm: 5.7px;
+  --radius-md: 9.5px;
+  --radius-lg: 15.2px;
+  --radius-xl: 22.8px;
+  --radius-2xl: 15.2px;
+  --min-width-table: 40rem;
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+    font-family: var(--font-display);
+    line-height: 1.2;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-cobalt);
+    outline-offset: 2px;
+  }
+}
+
+.section-anchor {
+  scroll-margin-top: 6.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 10mm 14mm;
+    @bottom-center {
+      content: "China Biotech Group  ·  September 2026 Peptide Price List  ·  Page " counter(page);
+      font-size: 8pt;
+      color: #5c5f68;
+    }
+  }
+  :root {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  html,
+  body {
+    background: white !important;
+    color: #111 !important;
+    font-size: 10.5pt !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  a {
+    text-decoration: none !important;
+    color: inherit !important;
+  }
+  .print-page {
+    break-inside: auto;
+  }
+  thead {
+    display: table-header-group;
+  }
+  tr {
+    break-inside: avoid;
+  }
+  table {
+    font-size: 9.5pt;
+  }
+  th,
+  td {
+    padding-top: 5px !important;
+    padding-bottom: 5px !important;
+  }
+  h2 {
+    break-after: avoid;
+  }
+}
