@@ -470,16 +470,12 @@ function compoundCodes(name: string, pack: string): string[] {
   return out;
 }
 
-function tokenMatchesBlob(token: string, blobLower: string): boolean {
+function tokenMatchesIndex(token: string, words: string[]): boolean {
   const compact = normalizeSearch(token);
   if (!compact) return true;
-  const compactWords = blobLower
-    .split(/[^a-z0-9]+/)
-    .map((word) => normalizeSearch(word))
-    .filter(Boolean);
-  if (compactWords.includes(compact)) return true;
+  if (words.includes(compact)) return true;
   const doseLike = /\d/.test(compact);
-  if (!doseLike && compact.length >= 3 && compactWords.some((word) => word.startsWith(compact))) {
+  if (!doseLike && compact.length >= 3 && words.some((word) => word.startsWith(compact))) {
     return true;
   }
   return false;
@@ -760,6 +756,39 @@ export const PRODUCTS: Product[] = DRAFTS.map((d) => ({
 export const STANDARD_PRODUCTS = PRODUCTS.filter((p) => !p.specialOrder);
 export const SPECIAL_ORDER_PRODUCTS = PRODUCTS.filter((p) => p.specialOrder);
 export const NEW_PRODUCTS = PRODUCTS.filter((p) => p.isNew);
+export const TOTAL_COMPOUNDS = groupByName(PRODUCTS).length;
+
+function searchBlobFor(product: Product): string {
+  const cat = categoryById(product.category);
+  const extra = product.specialOrder ? "quote moq special order make-to-order" : "";
+  return [
+    product.name,
+    product.pack,
+    product.unitNote ?? "",
+    product.headerNote ?? "",
+    ...(product.tags ?? []),
+    ...(COMPOUND_SEARCH_TAGS[product.name] ?? []),
+    ...compoundCodes(product.name, product.pack),
+    ...packSearchTags(product.pack),
+    ...(cat?.tags ?? []),
+    ...(cat?.searchTags ?? []),
+    extra,
+    product.isNew ? "new" : "",
+    product.outOfStock ? "out of stock oos unavailable" : "",
+  ]
+    .join(" ")
+    .toLowerCase();
+}
+
+const PRODUCT_SEARCH_WORDS = new Map(
+  PRODUCTS.map((product) => [
+    product.id,
+    searchBlobFor(product)
+      .split(/[^a-z0-9]+/)
+      .map((word) => normalizeSearch(word))
+      .filter(Boolean),
+  ]),
+);
 
 export function groupByName(products: Product[]): { name: string; items: Product[] }[] {
   const order: string[] = [];
@@ -798,25 +827,13 @@ export function productMatches(product: Product, query: string): boolean {
   const raw = query.trim().toLowerCase();
   if (!raw) return true;
   const tokens = raw.split(/\s+/).filter(Boolean);
-  const cat = categoryById(product.category);
-  const extra = product.specialOrder ? "quote moq special order make-to-order" : "";
-  const blob = [
-    product.name,
-    product.pack,
-    product.unitNote ?? "",
-    product.headerNote ?? "",
-    ...(product.tags ?? []),
-    ...(COMPOUND_SEARCH_TAGS[product.name] ?? []),
-    ...compoundCodes(product.name, product.pack),
-    ...packSearchTags(product.pack),
-    ...(cat?.tags ?? []),
-    ...(cat?.searchTags ?? []),
-    extra,
-    product.isNew ? "new" : "",
-    product.outOfStock ? "out of stock oos unavailable" : "",
-  ].join(" ");
-  const blobLower = blob.toLowerCase();
-  return tokens.every((token) => tokenMatchesBlob(token, blobLower));
+  const words =
+    PRODUCT_SEARCH_WORDS.get(product.id) ??
+    searchBlobFor(product)
+      .split(/[^a-z0-9]+/)
+      .map((word) => normalizeSearch(word))
+      .filter(Boolean);
+  return tokens.every((token) => tokenMatchesIndex(token, words));
 }
 
 export function searchProducts(query: string): Product[] {

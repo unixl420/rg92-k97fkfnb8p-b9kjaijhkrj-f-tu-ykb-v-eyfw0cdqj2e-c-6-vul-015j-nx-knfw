@@ -30,7 +30,8 @@ export const MobileCategoryList = memo(function MobileCategoryList({
       }
       const first = refs.current.get(groups[0]?.name ?? "");
       const show = Boolean(first && first.getBoundingClientRect().top < 8);
-      setStuck(show ? current : null);
+      const next = show ? current : null;
+      setStuck((prev) => (prev === next ? prev : next));
     };
     const onScroll = () => {
       if (!raf) raf = requestAnimationFrame(update);

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { Check, MousePointerClick } from "lucide-react";
 import { VOLUME_TIERS } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
@@ -26,7 +26,7 @@ function SelectMark({ active }: { active: boolean }) {
   );
 }
 
-export function VolumeModel({
+export const VolumeModel = memo(function VolumeModel({
   highlightTier,
   onSelect,
 }: {
@@ -154,4 +154,4 @@ export function VolumeModel({
       ) : null}
     </section>
   );
-}
+});

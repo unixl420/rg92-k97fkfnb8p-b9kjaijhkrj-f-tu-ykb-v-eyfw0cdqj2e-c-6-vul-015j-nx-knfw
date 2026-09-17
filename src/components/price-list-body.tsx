@@ -1,4 +1,5 @@
 import { Factory, FlaskConical, Package, Palette, Search, ShieldCheck, Sticker } from "lucide-react";
+import { useMemo } from "react";
 import { AssayPills } from "@/components/assay-pills";
 import { CategoryTable } from "@/components/category-table";
 import { ContactUsButton } from "@/components/contact-us-button";
@@ -12,6 +13,7 @@ import {
   LIST_META,
   PRODUCTS,
   SPECIAL_ORDER_PRODUCTS,
+  TOTAL_COMPOUNDS,
   productMatches,
 } from "@/lib/catalog";
 import { useMdUp } from "@/lib/use-md-up";
@@ -35,38 +37,53 @@ export function PriceListBody({
 }) {
   const mdUp = useMdUp();
   const q = query.trim();
-  const grouped = CATEGORIES.map((cat) => ({
-    cat,
-    rows: PRODUCTS.filter((p) => {
-      if (p.category !== cat.id || p.specialOrder) return false;
-      return productMatches(p, q);
-    }),
-  })).filter((g) => {
-    if (!g.rows.length) return false;
-    if (printable || section === "all") return true;
-    return g.cat.id === section;
-  });
+  const grouped = useMemo(
+    () =>
+      CATEGORIES.map((cat) => ({
+        cat,
+        rows: PRODUCTS.filter((p) => {
+          if (p.category !== cat.id || p.specialOrder) return false;
+          return productMatches(p, q);
+        }),
+      })).filter((g) => {
+        if (!g.rows.length) return false;
+        if (printable || section === "all") return true;
+        return g.cat.id === section;
+      }),
+    [q, section, printable],
+  );
 
   const oemQuery = /\b(oem|private\s*label|white\s*label|custom\s*(cap|label|sticker|brand)|branding)\b/i.test(
     q,
   );
   const showFactoryPair = printable || section === "all" || section === "special-order" || oemQuery;
-  const specials = SPECIAL_ORDER_PRODUCTS.filter((p) => {
-    if (!showFactoryPair) return false;
-    if (q && !oemQuery && !productMatches(p, q)) return false;
-    return true;
-  });
-  const specialByCategory = CATEGORIES.map((cat) => ({
-    cat,
-    groups: groupByName(specials.filter((p) => p.category === cat.id)),
-  })).filter((block) => block.groups.length);
-  const showSpecialBlock = showFactoryPair && (!q || specials.length > 0 || oemQuery);
-  const matchCount = grouped.reduce((n, g) => n + groupByName(g.rows).length, 0);
-  const listedNames = new Set(
-    grouped.flatMap((g) => groupByName(g.rows).map((block) => block.name)),
+  const specials = useMemo(() => {
+    if (!showFactoryPair) return [];
+    return SPECIAL_ORDER_PRODUCTS.filter((p) => {
+      if (q && !oemQuery && !productMatches(p, q)) return false;
+      return true;
+    });
+  }, [q, oemQuery, showFactoryPair]);
+  const specialByCategory = useMemo(
+    () =>
+      CATEGORIES.map((cat) => ({
+        cat,
+        groups: groupByName(specials.filter((p) => p.category === cat.id)),
+      })).filter((block) => block.groups.length),
+    [specials],
   );
-  const extraSpecials = groupByName(specials).filter((g) => !listedNames.has(g.name)).length;
-  const totalCompounds = groupByName(PRODUCTS).length;
+  const showSpecialBlock = showFactoryPair && (!q || specials.length > 0 || oemQuery);
+  const matchCount = useMemo(
+    () => grouped.reduce((n, g) => n + groupByName(g.rows).length, 0),
+    [grouped],
+  );
+  const extraSpecials = useMemo(() => {
+    const listedNames = new Set(
+      grouped.flatMap((g) => groupByName(g.rows).map((block) => block.name)),
+    );
+    return groupByName(specials).filter((g) => !listedNames.has(g.name)).length;
+  }, [grouped, specials]);
+  const totalCompounds = TOTAL_COMPOUNDS;
 
   return (
     <article id="print-root" className="mx-auto max-w-6xl px-[26px] pb-20 pt-6 lg:px-8">
@@ -75,6 +92,10 @@ export function PriceListBody({
           <img
             src="/brand/cbp.png"
             alt="China Biotech Group"
+            width={150}
+            height={150}
+            decoding="async"
+            fetchPriority="high"
             draggable={false}
             onContextMenu={(e) => e.preventDefault()}
             className="pointer-events-none -mb-3 size-[120px] shrink-0 select-none object-contain sm:mb-0 sm:size-[150px]"

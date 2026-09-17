@@ -16,22 +16,27 @@ const HOLD_MS = 450;
 function useFabOffset() {
   const [bottom, setBottom] = useState(EDGE);
   useEffect(() => {
-    const update = () => {
+    let raf = 0;
+    const measure = () => {
+      raf = 0;
       if (document.hidden) return;
       const footer = document.getElementById("site-footer");
-      if (!footer) {
-        setBottom(EDGE);
-        return;
-      }
-      const fromBottom = window.innerHeight - footer.getBoundingClientRect().top;
-      setBottom(fromBottom > 0 ? fromBottom + GAP : EDGE);
+      const fromBottom = footer
+        ? window.innerHeight - footer.getBoundingClientRect().top
+        : 0;
+      const value = fromBottom > 0 ? fromBottom + GAP : EDGE;
+      setBottom((prev) => (prev === value ? prev : value));
     };
-    update();
+    const update = () => {
+      if (!raf) raf = requestAnimationFrame(measure);
+    };
+    measure();
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     return () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
+      if (raf) cancelAnimationFrame(raf);
     };
   }, []);
   return bottom;
@@ -128,7 +133,94 @@ function StopAddingButton({ onStop }: { onStop: () => void }) {
   );
 }
 
-export function BackToTop() {
+function GlassSearch({
+  query,
+  onQuery,
+}: {
+  query: string;
+  onQuery: (q: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const field = useRef<HTMLInputElement>(null);
+  const root = useRef<HTMLDivElement>(null);
+
+  const collapse = () => setOpen(false);
+
+  useEffect(() => {
+    if (!open) return;
+    const id = window.setTimeout(() => field.current?.focus(), 220);
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") collapse();
+    };
+    const onPointer = (event: Event) => {
+      if (root.current && !root.current.contains(event.target as Node)) collapse();
+    };
+    window.addEventListener("keydown", onKey);
+    window.addEventListener("pointerdown", onPointer);
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("pointerdown", onPointer);
+    };
+  }, [open]);
+
+  return (
+    <div
+      ref={root}
+      className={cn(
+        "glass-search flex h-12 items-center overflow-hidden rounded-full border border-paper/40 bg-ink/80 text-paper shadow-lg backdrop-blur-xl sm:h-14",
+        open ? "glass-search-open pl-3.5 pr-1" : "justify-center",
+      )}
+    >
+      {open ? (
+        <>
+          <Search className="size-4 shrink-0 text-paper/55" strokeWidth={2} />
+          <input
+            ref={field}
+            type="text"
+            inputMode="search"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
+            value={query}
+            onChange={(event) => onQuery(event.target.value)}
+            placeholder="Find a peptide"
+            aria-label="Find a peptide"
+            className="min-w-0 flex-1 bg-transparent px-2.5 text-[15px] text-paper outline-none placeholder:text-paper/45"
+          />
+          <button
+            type="button"
+            aria-label="Close search"
+            className="grid size-10 shrink-0 place-items-center text-paper sm:size-12"
+            onClick={collapse}
+          >
+            <X className="size-5" strokeWidth={2} />
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          aria-label="Find a peptide"
+          className="relative grid size-12 place-items-center sm:size-14"
+          onClick={() => setOpen(true)}
+        >
+          <Search className="size-5" strokeWidth={2} />
+          {query.trim() ? (
+            <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-paper" />
+          ) : null}
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function BackToTop({
+  query = "",
+  onQuery,
+}: {
+  query?: string;
+  onQuery?: (q: string) => void;
+}) {
   const [show, setShow] = useState(false);
   const bottom = useFabOffset();
   const cart = useQuoteCart();
@@ -198,24 +290,13 @@ export function BackToTop() {
 
       {show ? (
         <div
-          className="glass-fab-stack no-print fixed z-40 flex flex-col gap-2.5"
+          className="glass-fab-stack no-print fixed z-40 flex flex-col items-end gap-2.5"
           style={{
             bottom: fabBottom,
             right: "max(1rem, env(safe-area-inset-right, 0px))",
           }}
         >
-          <button
-            type="button"
-            aria-label="Find a peptide"
-            className={FAB}
-            onClick={() => {
-              const field = document.getElementById("peptide-search");
-              field?.scrollIntoView({ behavior: "smooth", block: "center" });
-              window.setTimeout(() => field?.focus(), 350);
-            }}
-          >
-            <Search className="size-5" />
-          </button>
+          {onQuery ? <GlassSearch query={query} onQuery={onQuery} /> : null}
           <PageScrollFab direction="up" label="Scroll up" />
           <PageScrollFab direction="down" label="Scroll down" />
         </div>

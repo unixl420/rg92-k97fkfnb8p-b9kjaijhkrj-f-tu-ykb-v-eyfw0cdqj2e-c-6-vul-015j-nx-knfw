@@ -194,9 +194,18 @@
 .glass-fab:active svg {
   transform: scale(0.88);
 }
-.glass-fab-icon {
-  display: inline-flex;
-  animation: glass-fab-in 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+.glass-search {
+  width: 3rem;
+  will-change: width;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (min-width: 640px) {
+  .glass-search {
+    width: 3.5rem;
+  }
+}
+.glass-search-open {
+  width: min(18.5rem, calc(100vw - 5.5rem));
 }
 
 .cart-panel {
@@ -226,6 +235,54 @@
     transform: translateX(0);
     opacity: 1;
   }
+}
+
+@keyframes ship-chevron-nudge {
+  0%,
+  70%,
+  100% {
+    transform: translateY(0);
+  }
+  78% {
+    transform: translateY(4px);
+  }
+  86% {
+    transform: translateY(0);
+  }
+  93% {
+    transform: translateY(2px);
+  }
+}
+
+.cart-qty {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.cart-qty::-webkit-outer-spin-button,
+.cart-qty::-webkit-inner-spin-button {
+  margin: 0;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+@keyframes dest-slide-hint {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  35% {
+    transform: translateX(10px);
+  }
+  55% {
+    transform: translateX(0);
+  }
+  70% {
+    transform: translateX(6px);
+  }
+}
+
+.dest-slide-hint {
+  animation: dest-slide-hint 1.8s cubic-bezier(0.22, 1, 0.36, 1) 2;
 }
 .compound-float-name {
   animation: compound-name-in 0.3s cubic-bezier(0.22, 1, 0.36, 1);

@@ -1,7 +1,9 @@
 import { useLayoutEffect, useState } from "react";
 
 export function useMdUp() {
-  const [matches, setMatches] = useState(false);
+  const [matches, setMatches] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(min-width: 768px)").matches : false,
+  );
 
   useLayoutEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");

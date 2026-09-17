@@ -1,10 +1,11 @@
+import { memo } from "react";
 import { AddToQuote } from "@/components/add-to-quote";
 import { groupIsOutOfStock, OutOfStockFold } from "@/components/out-of-stock-fold";
 import { categoryById, groupByName, type Product } from "@/lib/catalog";
 import { VOLUME_TIERS } from "@/lib/pricing";
 import { cn, usd } from "@/lib/utils";
 
-export function CategoryTable({
+export const CategoryTable = memo(function CategoryTable({
   products,
   highlightTier,
 }: {
@@ -50,7 +51,7 @@ export function CategoryTable({
       })}
     </div>
   );
-}
+});
 
 function CompoundTable({
   group,

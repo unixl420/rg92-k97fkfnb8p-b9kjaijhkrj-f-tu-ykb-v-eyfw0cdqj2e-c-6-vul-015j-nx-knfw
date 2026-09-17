@@ -16,7 +16,7 @@ function Home() {
   return (
     <QuoteCartProvider>
       <div className="min-h-screen">
-        <BackToTop />
+        <BackToTop query={query} onQuery={setQuery} />
         <QuoteTray />
         <PriceListBody
           query={query}
