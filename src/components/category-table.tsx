@@ -1,3 +1,4 @@
+import { AddToQuote } from "@/components/add-to-quote";
 import { categoryById, groupByName, type Product } from "@/lib/catalog";
 import { VOLUME_TIERS } from "@/lib/pricing";
 import { cn, usd } from "@/lib/utils";
@@ -65,12 +66,13 @@ export function CategoryTable({
                 {group.items.map((p, i) => (
                   <tr key={p.id} className={i % 2 === 0 ? "bg-card" : "bg-paper-deep/80"}>
                     <td
-                      className="px-[26px] py-3 font-semibold"
+                      className="flex items-center px-[26px] py-3 font-semibold"
                       style={{
                         color: accent,
                         borderTop: i === 0 ? undefined : `1px solid ${accent}26`,
                       }}
                     >
+                      <AddToQuote product={p} accent={accent} />
                       {p.pack}
                       {p.unitNote ? (
                         <span className="ml-2 text-sm font-normal text-muted">{p.unitNote}</span>

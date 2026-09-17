@@ -1,3 +1,4 @@
+import { AddToQuote } from "@/components/add-to-quote";
 import { useEffect, useRef, useState } from "react";
 import { categoryById, groupByName, type Product } from "@/lib/catalog";
 import { VOLUME_TIERS } from "@/lib/pricing";
@@ -125,7 +126,8 @@ function MobileStrength({
       className="px-[26px] py-5"
       style={lined ? { borderTop: `1px solid ${accent}2e` } : undefined}
     >
-      <p className="text-lg font-semibold" style={{ color: accent }}>
+      <p className="flex items-center text-lg font-semibold" style={{ color: accent }}>
+        <AddToQuote product={product} accent={accent} />
         {product.pack}
         {product.unitNote ? (
           <span className="ml-2 text-sm font-normal text-muted">{product.unitNote}</span>

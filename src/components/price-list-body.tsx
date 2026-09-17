@@ -1,4 +1,5 @@
-import { FlaskConical, Search, ShieldCheck } from "lucide-react";
+import { Factory, FlaskConical, Package, Palette, Search, ShieldCheck, Sticker } from "lucide-react";
+import { AddToQuote } from "@/components/add-to-quote";
 import { AssayPills } from "@/components/assay-pills";
 import { CategoryTable } from "@/components/category-table";
 import { ContactUsButton } from "@/components/contact-us-button";
@@ -44,11 +45,11 @@ export function PriceListBody({
     return g.cat.id === section;
   });
 
-  const specials = SPECIAL_ORDER_PRODUCTS.filter((p) => {
-    if (!productMatches(p, q)) return false;
-    if (printable || section === "all" || section === "special-order") return true;
-    return false;
-  });
+  const oemQuery = /\b(oem|private\s*label|white\s*label|custom\s*(cap|label|sticker|brand)|branding)\b/i.test(
+    q,
+  );
+  const showFactoryPair = printable || section === "all" || section === "special-order" || oemQuery;
+  const specials = showFactoryPair ? SPECIAL_ORDER_PRODUCTS : [];
   const specialGroups = groupByName(specials);
   const matchCount = grouped.reduce((n, g) => n + groupByName(g.rows).length, 0);
   const totalCompounds = groupByName(PRODUCTS).length;
@@ -133,7 +134,7 @@ export function PriceListBody({
       </div>
 
       {printable ? null : (
-        <div className="no-print mb-2 mt-8">
+        <div id="peptide-finder" className="no-print mb-2 mt-8">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -230,7 +231,8 @@ export function PriceListBody({
         )}
       </div>
 
-      {specials.length ? (
+      {showFactoryPair ? (
+        <>
         <section
           id="special-order"
           className="section-anchor print-page mt-14 rounded-2xl border-2 border-cobalt bg-cobalt/5 px-[26px] py-6 sm:px-8 sm:py-7"
@@ -253,20 +255,69 @@ export function PriceListBody({
           </h2>
           <p className="mt-2 max-w-3xl text-base text-ink">
             Make-to-order items. Minimum 100 kits; pricing is quoted, not listed on the volume ladder.
-            Ask your China Biotech Group representative for a factory quote.
+            Ask our representative for a factory quote.
           </p>
           <p className="sr-only">quote · MOQ 100 kits · make-to-order</p>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {specialGroups.map((group) => (
               <article key={group.name} className="rounded-lg border border-cobalt/20 bg-card px-[22px] py-4">
                 <p className="font-semibold">{group.name}</p>
-                <p className="mt-1 text-base text-ink-soft">
-                  {group.items.map((p) => p.pack).join(" · ")}
+                <p className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-2 text-base text-ink-soft">
+                  {group.items.map((p, i) => (
+                    <span key={p.id} className="inline-flex items-center">
+                      {i > 0 ? <span className="mr-1">·</span> : null}
+                      <AddToQuote product={p} accent="#1b4f8a" />
+                      {p.pack}
+                    </span>
+                  ))}
                 </p>
               </article>
             ))}
           </div>
         </section>
+
+        <section
+          id="oem"
+          className="section-anchor print-page mt-14 rounded-2xl border-2 border-cobalt bg-cobalt/5 px-[26px] py-6 sm:px-8 sm:py-7"
+        >
+          <p className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide text-cobalt">
+            <Factory className="size-5" />
+            OEM & private label
+          </p>
+          <h2 className="mt-2 text-2xl font-bold sm:text-3xl">Your logo on vials, boxes, and caps</h2>
+          <p className="mt-2 max-w-3xl text-base text-ink">{LIST_META.oem}</p>
+          <ul className="mt-5 grid gap-3 sm:grid-cols-3">
+            {[
+              {
+                icon: Sticker,
+                title: "Labels & stickers",
+                body: "Your logo printed on vials and boxes.",
+              },
+              {
+                icon: Palette,
+                title: "Custom caps",
+                body: "Cap color and branding to match your line.",
+              },
+              {
+                icon: Package,
+                title: "100 kits per SKU",
+                body: "Minimum order for customized packaging.",
+              },
+            ].map((item) => (
+              <li
+                key={item.title}
+                className="rounded-lg border border-cobalt/20 bg-card px-[22px] py-4"
+              >
+                <span className="inline-flex size-8 items-center justify-center rounded-full bg-cobalt/10 text-cobalt">
+                  <item.icon className="size-5" strokeWidth={2.25} />
+                </span>
+                <p className="mt-3 font-semibold">{item.title}</p>
+                <p className="mt-1 text-base text-ink-soft">{item.body}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+        </>
       ) : null}
 
       <section id="testing" className="section-anchor print-page mt-14 border-t border-line pt-8">

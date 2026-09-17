@@ -27,6 +27,7 @@ export type Product = {
   excludeFromVolume?: boolean;
   unitNote?: string;
   headerNote?: string;
+  tags?: string[];
 };
 
 export type Category = {
@@ -36,6 +37,7 @@ export type Category = {
   blurb: string;
   goal: string;
   tags: string[];
+  searchTags?: string[];
   accent: string;
 };
 
@@ -47,6 +49,18 @@ export const CATEGORIES: Category[] = [
     blurb: "For research on fat, appetite, blood sugar, and how the body uses energy.",
     goal: "Weight & metabolism",
     tags: ["fat", "appetite", "blood sugar", "energy use", "body composition", "metabolic"],
+    searchTags: [
+      "weight loss",
+      "obesity",
+      "glp-1",
+      "glp1",
+      "gip",
+      "incretin",
+      "diabetes",
+      "glucose",
+      "insulin",
+      "amylin",
+    ],
     accent: "#156f7a",
   },
   {
@@ -55,7 +69,8 @@ export const CATEGORIES: Category[] = [
     short: "Recovery",
     blurb: "For research on tissue repair — tendons, gut lining, wounds, and local inflammation.",
     goal: "Recovery & repair",
-    tags: ["repair", "tendon", "gut lining", "wound", "inflammation", "relaxin pathway"],
+    tags: ["repair", "tissue", "inflammation"],
+    searchTags: ["healing", "injury", "tissue repair"],
     accent: "#1b6b4a",
   },
   {
@@ -64,7 +79,8 @@ export const CATEGORIES: Category[] = [
     short: "Bioregulators",
     blurb: "Short peptides studied as signals for one organ at a time, such as lung, heart, or cartilage.",
     goal: "Organ-specific",
-    tags: ["organ-specific", "lung", "heart", "immune", "cortex", "cartilage"],
+    tags: ["organ-specific", "khavinson", "cytogen"],
+    searchTags: ["bioregulator", "organ peptide"],
     accent: "#3a5f8f",
   },
   {
@@ -73,7 +89,8 @@ export const CATEGORIES: Category[] = [
     short: "Longevity",
     blurb: "For research on how cells age, handle stress, and keep mitochondria working well.",
     goal: "Longevity",
-    tags: ["aging", "mitochondria", "cell survival", "cytoprotection"],
+    tags: ["aging", "cell survival", "cytoprotection"],
+    searchTags: ["longevity", "anti aging", "anti-aging", "senolytic"],
     accent: "#5d4e8c",
   },
   {
@@ -82,7 +99,8 @@ export const CATEGORIES: Category[] = [
     short: "GH & Secretagogues",
     blurb: "Peptides related to the body’s own growth-hormone pulse and IGF-1 signal.",
     goal: "Growth hormone",
-    tags: ["GH pulse", "GHRH", "IGF-1", "secretagogue", "MGF"],
+    tags: ["GH pulse", "secretagogue"],
+    searchTags: ["growth hormone", "secretagogue"],
     accent: "#1f4e79",
   },
   {
@@ -91,7 +109,8 @@ export const CATEGORIES: Category[] = [
     short: "Muscle",
     blurb: "For research on muscle size, the myostatin pathway, and oxygen-carrying red cells.",
     goal: "Muscle & performance",
-    tags: ["muscle size", "myostatin", "oxygen carry", "erythropoiesis"],
+    tags: ["muscle size", "performance"],
+    searchTags: ["muscle", "hypertrophy", "lean mass", "performance"],
     accent: "#8e3b4a",
   },
   {
@@ -100,7 +119,8 @@ export const CATEGORIES: Category[] = [
     short: "Sexual & Fertility",
     blurb: "For research on fertility and the pituitary–gonad axis.",
     goal: "Sexual health",
-    tags: ["fertility", "GnRH", "pituitary", "gonadotropin"],
+    tags: ["pituitary", "gonadotropin"],
+    searchTags: ["ivf", "gonadotropin"],
     accent: "#8a4568",
   },
   {
@@ -109,7 +129,8 @@ export const CATEGORIES: Category[] = [
     short: "Nootropics & Sleep",
     blurb: "For research on memory, mood, sleep, and the stress axis.",
     goal: "Cognition & sleep",
-    tags: ["memory", "mood", "sleep", "stress axis", "pineal", "nootropic"],
+    tags: ["memory", "mood", "nootropic"],
+    searchTags: ["brain", "cognition", "nootropic"],
     accent: "#3d4a8a",
   },
   {
@@ -118,7 +139,8 @@ export const CATEGORIES: Category[] = [
     short: "Aesthetic",
     blurb: "For research on skin, collagen, hair follicles, and pigment.",
     goal: "Skin, hair & aesthetic",
-    tags: ["skin", "collagen", "hair follicle", "copper peptide", "pigment"],
+    tags: ["skin", "aesthetic"],
+    searchTags: ["cosmetic"],
     accent: "#7d5b86",
   },
   {
@@ -127,7 +149,8 @@ export const CATEGORIES: Category[] = [
     short: "Immune",
     blurb: "For research on innate defense, the thymus, and antimicrobial peptides.",
     goal: "Immune",
-    tags: ["innate defense", "thymus", "antimicrobial", "cathelicidin"],
+    tags: ["immune", "thymus", "innate defense"],
+    searchTags: ["immune", "thymus"],
     accent: "#2f6d4f",
   },
   {
@@ -136,7 +159,8 @@ export const CATEGORIES: Category[] = [
     short: "Fat Loss",
     blurb: "For research on localized fat and body composition.",
     goal: "Body composition",
-    tags: ["localized fat", "carnitine", "body composition", "fat loss"],
+    tags: ["localized fat", "body composition", "fat loss"],
+    searchTags: ["lipolysis", "body composition"],
     accent: "#c45c4a",
   },
   {
@@ -145,7 +169,8 @@ export const CATEGORIES: Category[] = [
     short: "Support",
     blurb: "Water and solvents used to dissolve a vial. These are not peptides.",
     goal: "Lab support",
-    tags: ["sterile water", "solvent", "reconstitute", "BAC water", "not a peptide"],
+    tags: ["sterile water", "solvent", "reconstitute", "not a peptide"],
+    searchTags: ["reconstitution", "solvent", "diluent", "water for injection"],
     accent: "#4a6275",
   },
   {
@@ -155,12 +180,311 @@ export const CATEGORIES: Category[] = [
     blurb: "Useful tools that do not sit neatly in one organ system.",
     goal: "Specialty",
     tags: ["niche pathway", "growth-factor", "matrix"],
+    searchTags: ["specialty", "custom", "research tool"],
     accent: "#3d4c5c",
   },
 ];
 
 export function categoryById(id: CategoryId): Category | undefined {
   return CATEGORIES.find((c) => c.id === id);
+}
+
+const COMPOUND_SEARCH_TAGS: Record<string, string[]> = {
+  Retatrutide: [
+    "reta", "glp-3", "glp3", "triple agonist", "gip", "glucagon", "ly3437943",
+    "weight", "appetite", "glucose", "incretin", "obesity research",
+  ],
+  Tirzepatide: [
+    "tirz", "mounjaro", "zepbound", "dual agonist", "glp-1", "gip", "ly3298176",
+    "weight", "appetite", "glucose", "incretin",
+  ],
+  Semaglutide: [
+    "sema", "ozempic", "wegovy", "rybelsus", "glp-1", "glp1", "nn9535",
+    "weight", "appetite", "glucose", "incretin",
+  ],
+  Mazdutide: ["glp-1", "glucagon", "dual agonist", "ibi362", "weight", "appetite", "glucose"],
+  Survodutide: ["glp-1", "glucagon", "dual agonist", "bi 456906", "weight", "liver", "glucose"],
+  Cagrilintide: ["cagri", "amylin", "amycretin", "satiety", "appetite"],
+  "Cagrilintide + Semaglutide": ["cagri", "sema", "cagrisema", "amylin", "glp-1", "combo", "satiety", "appetite"],
+  Cagrisema: ["cagri", "sema", "cagrilintide", "semaglutide", "amylin", "glp-1", "combo", "satiety"],
+  Liraglutide: ["lira", "victoza", "saxenda", "glp-1", "appetite", "glucose"],
+  Dulaglutide: ["trulicity", "glp-1", "dula", "glucose", "incretin"],
+  AOD9604: ["aod", "hgh fragment", "fat loss fragment", "176-191", "lipolysis", "fat metabolism"],
+  "Lemon Bottle": [
+    "fat dissolve", "lipolysis", "ppc", "deoxycholate", "body contour", "10ml", "bottle",
+    "localized fat", "phosphatidylcholine",
+  ],
+  "HGH Fragment 176-191": ["hgh frag", "frag 176", "176-191", "aod9604", "fragment", "lipolysis", "fat metabolism"],
+  "HGH Fragment 17-23": ["hgh frag", "frag 17-23", "fragment", "lipolysis"],
+  "SLU-PP-322": ["err agonist", "exercise mimetic", "slu", "energy expenditure", "mitochondria"],
+  "BPC-157": [
+    "bpc", "body protection compound", "bepecin", "gut", "tendon", "repair",
+    "angiogenesis", "wound", "joint", "stomach", "intestine",
+  ],
+  "TB-500": [
+    "tb500", "thymosin beta 4", "tb4", "tβ4", "wound", "actin", "mobility",
+    "recovery", "soft tissue",
+  ],
+  "BPC 5mg + TB 5mg": ["bpc", "tb500", "wolverine", "blend", "combo", "repair", "joint", "tendon"],
+  "BPC 10mg + TB 10mg": ["bpc", "tb500", "wolverine", "blend", "combo", "repair", "joint", "tendon"],
+  "BPC-157 + TB-500": ["bpc", "tb500", "wolverine", "blend", "combo", "repair", "joint", "tendon"],
+  GLOW70: ["glow", "bpc", "tb500", "ghk", "blend", "skin", "repair", "collagen"],
+  KLOW80: ["klow", "kpv", "bpc", "tb500", "ghk", "blend", "inflammation", "skin", "gut"],
+  KPV: ["alpha msh", "inflammation", "gut", "melanocortin", "intestine"],
+  "B7-33": ["relaxin", "rxfp1", "fibrosis", "heart", "vascular"],
+  TBF: ["thymosin", "fragment", "repair", "immune"],
+  Bronchogen: ["lung", "respiratory", "khavinson", "bronchi", "airway", "pulmonary"],
+  Cardiogen: ["heart", "cardiac", "khavinson", "myocardium", "cardiovascular"],
+  Crystagen: ["immune", "khavinson", "lymphoid", "thymus"],
+  Cortagen: ["cortex", "brain", "khavinson", "cognition", "cns"],
+  Cartalax: ["cartilage", "joint", "khavinson", "connective tissue", "chondrocyte"],
+  Epithalon: ["epitalon", "epithalamin", "telomere", "pineal", "circadian", "aging"],
+  "NAD+": ["nad", "nicotinamide", "nadh", "niagen", "sirtuin", "cellular energy", "mitochondria"],
+  "MOTS-c": ["motsc", "mitochondrial", "exercise mimetic", "metabolic", "ampk"],
+  "SS-31": ["elamipretide", "bendavia", "mitochondria", "cardiolipin", "heart"],
+  Aicar: ["acadesine", "ampk", "exercise mimetic", "endurance"],
+  "FOXO4-DRI": ["foxo4", "senolytic", "dri", "senescent cells", "aging"],
+  Humanin: ["mitochondria", "hng", "cytoprotection", "cell survival"],
+  "PNC-27": ["p53", "hdm2", "membrane"],
+  "CJC-1295 (No DAC)": ["cjc", "mod grf", "mod grf 1-29", "no dac", "ghrh", "gh pulse", "pituitary"],
+  "CJC-1295 (With DAC)": ["cjc", "cjc dac", "with dac", "ghrh", "gh pulse", "pituitary"],
+  "CJC-1295 + Ipamorelin": ["cjc", "ipa", "stack", "combo", "ghrh", "ghrp", "gh pulse"],
+  Ipamorelin: ["ipa", "ghrp", "secretagogue", "gh pulse", "ghrelin", "pituitary"],
+  Tesamorelin: ["egrifta", "ghrh", "visceral fat", "gh pulse", "abdominal fat"],
+  "GHRP-2": ["ghrp2", "pralmorelin", "secretagogue", "ghrelin", "gh pulse"],
+  "GHRP-6": ["ghrp6", "secretagogue", "ghrelin", "gh pulse", "appetite"],
+  "Hexarelin Acetate": ["hexarelin", "examorelin", "ghrp", "gh pulse", "cardiac"],
+  Sermorelin: ["ghrh 1-29", "ghrh", "gh pulse", "pituitary"],
+  "HGH 191AA": ["hgh", "somatropin", "growth hormone", "191aa", "rhgh", "igf-1", "stature"],
+  "MK-677": ["mk677", "ibutamoren", "ghrelin", "oral", "gh pulse", "appetite"],
+  "Tesamorelin + Ipamorelin": ["tesa", "ipa", "stack", "combo", "visceral fat", "gh pulse"],
+  "PEG-MGF": ["pegmgf", "mechano growth factor", "peginated mgf", "muscle repair", "hypertrophy"],
+  "IGF-DES": ["igf des", "des 1-3", "igf1", "local igf", "muscle"],
+  PT141: ["pt-141", "bremelanotide", "vyleesi", "libido", "arousal", "melanocortin"],
+  "Kisspeptin-10": ["kisspeptin", "kp10", "metastin", "gnrh", "fertility", "puberty axis", "lh"],
+  "Oxytocin Acetate": ["oxytocin", "pitocin", "bonding", "uterine", "lactation research"],
+  HCG: ["hcg", "human chorionic gonadotropin", "pregnyl", "ovidrel", "lh", "fertility", "gonadal"],
+  Gonadorelin: ["gnrh", "lhrh", "factrel", "pituitary", "fertility"],
+  "Gonadorelin Acetate": ["gnrh", "lhrh", "pituitary", "fertility"],
+  "Triptorelin Acetate": ["triptorelin", "gnrh agonist", "decapeptyl", "pituitary"],
+  Selank: ["tuftsin", "anxiety", "anxiolytic", "stress", "immune-neuro"],
+  Semax: ["acth fragment", "nootropic", "focus", "bdnf", "cognition"],
+  DSIP: ["delta sleep", "sleep peptide", "insomnia", "sleep"],
+  Dihexa: ["angiotensin iv", "pnb-0408", "memory", "synapse", "cognition"],
+  Cerebrolysin: ["brain hydrolysate", "neurotrophic", "cognition", "stroke research"],
+  "Orexin A": ["hypocretin 1", "wakefulness", "narcolepsy", "arousal", "sleep-wake"],
+  "Orexin B": ["hypocretin 2", "wakefulness", "sleep-wake"],
+  P21: ["cntf", "nootropic", "neurogenesis", "memory"],
+  Adamax: ["semax analog", "nootropic", "focus", "cognition"],
+  "PE-22-28": ["spadin", "trek1", "mood"],
+  Pinealon: ["pineal", "cortexin", "cognition", "circadian"],
+  Melatonin: ["sleep", "pineal", "circadian", "jet lag research"],
+  "ACTH 1-39": ["acth", "corticotropin", "adrenal", "cortisol axis"],
+  "GHK-Cu": ["ghk", "copper peptide", "skin", "hair", "collagen", "remodeling", "wound"],
+  "Snap-8": ["snap8", "acetyl octapeptide", "wrinkle", "botox alternative", "expression lines", "snap-25"],
+  "Melanotan II": ["mt2", "mt-2", "tanning", "melanotan 2", "pigment", "melanocortin", "uv"],
+  "Melanotan I": ["mt1", "afamelanotide", "scenesse", "tanning", "pigment", "photoprotection"],
+  Glutathione: ["gsh", "antioxidant", "skin brightening", "redox", "pigment", "liver"],
+  Matrixyl: ["palmitoyl pentapeptide", "collagen", "wrinkle", "ecm", "matrikine"],
+  "AHK-Cu": ["ahk", "copper peptide", "hair", "follicle"],
+  "PTD-DBM": ["wnt", "hair follicle", "cxxc5", "hair"],
+  "Botulinum Toxin": ["botox", "btxa", "onabotulinumtoxin", "wrinkle", "neuromuscular", "snap-25"],
+  "Thymosin alpha 1": ["tα1", "ta1", "thymalfasin", "zadaxin", "t-cell", "innate", "thymus"],
+  Thymalin: ["thymus", "thymogen", "immune aging", "t-cell"],
+  "KK-37": ["cathelicidin", "antimicrobial", "innate defense"],
+  "CBL-514": ["cbl", "fat dissolve", "injectable fat", "adipocyte", "localized fat"],
+  "L-Carnitine": ["carnitine", "l carnitine", "fat metabolism", "fatty acid transport", "energy"],
+  "Lipo-C": ["lipo c", "lipotropic", "micc", "carnitine", "liver", "choline"],
+  "5-Amino-1MQ": ["nnmt", "1mq", "amino1mq", "nad", "energy expenditure"],
+  Adipotide: ["ftpp", "prohibitin", "targeted fat", "adipose vasculature"],
+  "FST 344": ["follistatin 344", "fst344", "myostatin", "muscle growth"],
+  "GDF-8": ["myostatin", "gdf8", "muscle growth"],
+  "IGF-1 LR3": ["igf1", "igf-1", "long r3", "lr3", "hypertrophy", "anabolic"],
+  MGF: ["mechano growth factor", "igf-1ec", "muscle repair", "hypertrophy"],
+  "ACE-031": ["activin", "myostatin inhibitor", "muscle growth"],
+  Follistatin: ["fst", "myostatin", "muscle growth"],
+  EPO: ["erythropoietin", "epoetin", "red blood cells", "oxygen", "hematopoiesis"],
+  "Bacteriostatic Water": ["bac water", "bac", "bw", "benzyl alcohol", "reconstitute", "diluent"],
+  "Acetic Water": ["acetic acid", "0.6%", "solvent", "reconstitute", "acidic peptides"],
+  "Sterile Water": ["wfi", "water for injection", "swfi", "reconstitute"],
+  "B-12": ["b12", "cobalamin", "cyanocobalamin", "methylcobalamin", "vitamin", "methylation"],
+  "ARA 290": ["cibinetide", "ara290", "innate repair", "neuropathy", "epo analog"],
+  VIP: ["vasoactive intestinal peptide", "aviptadil", "pulmonary", "lung", "immune"],
+  Dermorphin: ["opioid peptide", "mu agonist", "analgesia research", "pain research"],
+  "TGF-DES": ["tgf", "transforming growth", "matrix", "ecm"],
+  HMG: ["hmg", "menotropin", "fsh", "lh", "menopur", "fertility"],
+  "LL-37": ["cathelicidin", "antimicrobial", "ll37", "innate defense"],
+  "Etelcalcetide Hydrochloride": ["etelcalcetide", "parsabiv", "calcimimetic", "pth", "calcium"],
+};
+
+const COMPOUND_ABBREVS: Record<string, string[]> = {
+  Retatrutide: ["rt", "reta", "rtt", "ly3437943"],
+  Tirzepatide: ["tz", "tzp", "tirz", "triz", "ly3298176"],
+  Semaglutide: ["sm", "sg", "sema", "sem", "smg", "nn9535"],
+  Mazdutide: ["maz", "ibi362", "ibi-362"],
+  Survodutide: ["survo", "sur", "bi456906", "bi-456906"],
+  Cagrilintide: ["cagri", "cag", "cagril"],
+  "Cagrilintide + Semaglutide": ["cagrisema", "cs", "cagri", "sema", "cagsema"],
+  Cagrisema: ["cs", "cagrisema", "cagri", "sema", "cagsema"],
+  Liraglutide: ["lira", "lrg", "nn2211"],
+  Dulaglutide: ["dula", "dul", "ly2189265"],
+  AOD9604: ["aod", "aod96", "aod-9604", "9604"],
+  "Lemon Bottle": ["lb", "lemon", "ppc"],
+  "HGH Fragment 176-191": ["hghfrag", "frag176", "f176", "frag", "hgh-f", "176191"],
+  "HGH Fragment 17-23": ["frag1723", "f1723", "1723"],
+  "SLU-PP-322": ["slu", "slupp322", "slu-pp", "slupp"],
+  "BPC-157": ["bpc", "bpc157", "bpc-157", "157"],
+  "TB-500": ["tb500", "tb5", "tb4", "tb-500", "tb-4", "thymosinb4"],
+  "BPC 5mg + TB 5mg": ["wolverine", "bpc", "tb500", "bpc5tb5", "bpc/tb", "bpctb"],
+  "BPC 10mg + TB 10mg": ["wolverine", "bpc", "tb500", "bpc10tb10", "bpc/tb", "bpctb"],
+  "BPC-157 + TB-500": ["wolverine", "bpc", "tb500", "bpctb", "bpc/tb", "bpc157tb500"],
+  GLOW70: ["glow", "glow70", "glow-70"],
+  KLOW80: ["klow", "klow80", "klow-80"],
+  KPV: ["kpv", "kpv-"],
+  "B7-33": ["b733", "b7", "b7-33"],
+  TBF: ["tbf"],
+  Bronchogen: ["broncho", "brp"],
+  Cardiogen: ["cardio", "crg"],
+  Crystagen: ["crysta", "cyg"],
+  Cortagen: ["corta", "ctg"],
+  Cartalax: ["carta", "ctl"],
+  Epithalon: ["epi", "epitalon", "epithalamin", "epithalamine"],
+  "NAD+": ["nad", "nadh", "nadplus"],
+  "MOTS-c": ["motsc", "mots", "mots-c"],
+  "SS-31": ["ss31", "ss-31", "elamipretide"],
+  Aicar: ["aicar", "aic"],
+  "FOXO4-DRI": ["foxo4", "foxo", "foxo4dri"],
+  Humanin: ["hng", "humanin", "hn"],
+  "PNC-27": ["pnc27", "pnc", "pnc-27"],
+  "CJC-1295 (No DAC)": ["cjc", "modgrf", "nodac", "cjc1295", "grf129", "mod-grf"],
+  "CJC-1295 (With DAC)": ["cjcdac", "cjc", "cjc1295dac", "cjc-dac"],
+  "CJC-1295 + Ipamorelin": ["cjcipa", "cjc", "ipa", "cjc/ipa", "cjcipa"],
+  Ipamorelin: ["ipa", "ipam"],
+  Tesamorelin: ["tesa", "tes", "tesam"],
+  "GHRP-2": ["ghrp2", "ghrp-2"],
+  "GHRP-6": ["ghrp6", "ghrp-6"],
+  "Hexarelin Acetate": ["hexa", "hexarelin", "hex"],
+  Sermorelin: ["sermo", "serm", "grf1-29"],
+  "HGH 191AA": ["hgh", "gh", "rhgh", "191aa", "somatropin", "hgh191"],
+  "MK-677": ["mk677", "mk", "ibutamoren", "ibuta", "mk-677"],
+  "Tesamorelin + Ipamorelin": ["tesaipa", "tesa", "ipa", "tes/ipa"],
+  "PEG-MGF": ["pegmgf", "mgf", "peg-mgf"],
+  "IGF-DES": ["igfdes", "des", "igf-des", "des13"],
+  PT141: ["pt141", "pt-141", "pt", "brem"],
+  "Kisspeptin-10": ["kp10", "kp", "kisspeptin", "kiss"],
+  "Oxytocin Acetate": ["oxt", "ot", "oxy"],
+  HCG: ["hcg", "hcg-"],
+  Gonadorelin: ["gnrh", "lhrh"],
+  "Gonadorelin Acetate": ["gnrh", "lhrh"],
+  "Triptorelin Acetate": ["tripto", "trp"],
+  Selank: ["selank", "sel"],
+  Semax: ["semax", "smx"],
+  DSIP: ["dsip"],
+  Dihexa: ["dihexa", "dih"],
+  Cerebrolysin: ["cerebro", "cbln"],
+  "Orexin A": ["orexina", "hcrt1", "orexin-a"],
+  "Orexin B": ["orexinb", "hcrt2", "orexin-b"],
+  P21: ["p21"],
+  Adamax: ["adamax", "admx"],
+  "PE-22-28": ["pe2228", "pe22", "pe-22-28"],
+  Pinealon: ["pinealon", "pin"],
+  Melatonin: ["mlt", "mel"],
+  "ACTH 1-39": ["acth", "acth139"],
+  "GHK-Cu": ["ghk", "ghkcu", "ghk-cu", "cu-ghk"],
+  "Snap-8": ["snap8", "snap", "snap-8"],
+  "Melanotan II": ["mt2", "mt-2", "mtii", "mt-ii", "melanotan2"],
+  "Melanotan I": ["mt1", "mt-1", "mti", "mt-i", "melanotan1", "afamelanotide"],
+  Glutathione: ["gsh", "glu"],
+  Matrixyl: ["matrixyl", "pal-kttks"],
+  "AHK-Cu": ["ahk", "ahkcu", "ahk-cu"],
+  "PTD-DBM": ["ptddbm", "ptd", "ptd-dbm"],
+  "Botulinum Toxin": ["botox", "btx", "btxa", "ona"],
+  "Thymosin alpha 1": ["ta1", "talpha1", "tα1", "thymalfasin"],
+  Thymalin: ["thymalin", "thym"],
+  "KK-37": ["kk37", "kk-37"],
+  "CBL-514": ["cbl", "cbl514", "cbl-514"],
+  "L-Carnitine": ["carnitine", "lcarn", "l-carn"],
+  "Lipo-C": ["lipoc", "lipo-c", "micc"],
+  "5-Amino-1MQ": ["1mq", "amino1mq", "5amino1mq", "5-amino-1mq"],
+  Adipotide: ["adipotide", "ftpp"],
+  "FST 344": ["fst344", "fst", "fst-344"],
+  "GDF-8": ["gdf8", "gdf-8"],
+  "IGF-1 LR3": ["igf1", "lr3", "igflr3", "igf-1", "longr3"],
+  MGF: ["mgf"],
+  "ACE-031": ["ace031", "ace", "ace-031"],
+  Follistatin: ["fst", "follistatin"],
+  EPO: ["epo", "epoetin"],
+  "Bacteriostatic Water": ["bac", "bw", "bac-h2o", "bach2o"],
+  "Acetic Water": ["aa", "acetic", "0.6aa"],
+  "Sterile Water": ["swfi", "wfi", "sw"],
+  "B-12": ["b12", "b-12"],
+  "ARA 290": ["ara290", "ara", "ara-290"],
+  VIP: ["vip"],
+  Dermorphin: ["derm", "drm"],
+  "TGF-DES": ["tgfdes", "tgf", "tgf-des"],
+  HMG: ["hmg", "hmg-"],
+  "LL-37": ["ll37", "ll-37"],
+  "Etelcalcetide Hydrochloride": ["etel", "etelcalcetide"],
+};
+
+function doseFromPack(pack: string): string | null {
+  const match = pack.match(/(\d+(?:\.\d+)?)/);
+  return match ? match[1] : null;
+}
+
+function compoundCodes(name: string, pack: string): string[] {
+  const abbrevs = COMPOUND_ABBREVS[name] ?? [];
+  const dose = doseFromPack(pack);
+  const out: string[] = [...abbrevs];
+  if (dose) {
+    for (const abbrev of abbrevs) {
+      out.push(
+        `${abbrev}${dose}`,
+        `${abbrev}-${dose}`,
+        `${abbrev} ${dose}`,
+        `${abbrev}${dose}mg`,
+        `${abbrev}-${dose}mg`,
+      );
+    }
+  }
+  return out;
+}
+
+function tokenMatchesBlob(token: string, blobLower: string): boolean {
+  const compact = normalizeSearch(token);
+  if (!compact) return true;
+  const compactWords = blobLower
+    .split(/[^a-z0-9]+/)
+    .map((word) => normalizeSearch(word))
+    .filter(Boolean);
+  if (compactWords.includes(compact)) return true;
+  const doseLike = /\d/.test(compact);
+  if (!doseLike && compact.length >= 3 && compactWords.some((word) => word.startsWith(compact))) {
+    return true;
+  }
+  return false;
+}
+
+function packSearchTags(pack: string): string[] {
+  const tags: string[] = [];
+  const lower = pack.toLowerCase();
+  const re = /(\d+(?:\.\d+)?)\s*(mg|mcg|µg|ug|iu|ml|g)\b/gi;
+  let match: RegExpExecArray | null;
+  while ((match = re.exec(pack))) {
+    const n = match[1];
+    const u = match[2].toLowerCase().replace("µg", "mcg").replace("ug", "mcg");
+    tags.push(`${n}${u}`, `${n} ${u}`);
+    if (u === "mg") tags.push("milligram", "milligrams");
+    if (u === "ml") tags.push("milliliter", "milliliters", "liquid");
+    if (u === "iu") tags.push("iu", "units", "international units");
+    if (u === "g") tags.push("gram", "grams");
+    if (u === "mcg") tags.push("microgram", "micrograms", "mcg", "ug");
+  }
+  if (lower.includes("vial")) tags.push("vial", "single vial");
+  if (lower.includes("bottle")) tags.push("bottle", "single bottle");
+  if (lower.includes("kit")) tags.push("kit");
+  if (lower.includes("single")) tags.push("single");
+  return tags;
 }
 
 type Draft = {
@@ -173,6 +497,7 @@ type Draft = {
   excludeFromVolume?: boolean;
   unitNote?: string;
   headerNote?: string;
+  tags?: string[];
 };
 
 function item(
@@ -222,9 +547,7 @@ const DRAFTS: Draft[] = [
   item("Dulaglutide", "10mg", "metabolic", volumeTiers(537), { isNew: true }),
   item("AOD9604", "5mg", "metabolic", [116, 101, 87, 73, 58]),
   item("AOD9604", "10mg", "metabolic", [244, 213, 183, 153, 122]),
-  item("Lemon Bottle", "10ml", "metabolic", [73, 63, 54, 45, 36], {
-    headerNote: "Single 10ml bottle",
-  }),
+  item("Lemon Bottle", "Single 10ml bottle", "metabolic", [73, 63, 54, 45, 36]),
   item("HGH Fragment 176-191", "1mg", "metabolic", [24, 21, 19, 15, 12]),
   item("HGH Fragment 176-191", "2mg", "metabolic", [34, 30, 25, 21, 18]),
   item("HGH Fragment 176-191", "5mg", "metabolic", [139, 122, 105, 87, 69]),
@@ -449,6 +772,7 @@ export function normalizeSearch(value: string): string {
 export function productMatches(product: Product, query: string): boolean {
   const raw = query.trim().toLowerCase();
   if (!raw) return true;
+  const tokens = raw.split(/\s+/).filter(Boolean);
   const cat = categoryById(product.category);
   const extra = product.specialOrder ? "quote moq special order make-to-order" : "";
   const blob = [
@@ -456,16 +780,17 @@ export function productMatches(product: Product, query: string): boolean {
     product.pack,
     product.unitNote ?? "",
     product.headerNote ?? "",
-    cat?.label ?? "",
-    cat?.short ?? "",
-    cat?.goal ?? "",
-    cat?.blurb ?? "",
+    ...(product.tags ?? []),
+    ...(COMPOUND_SEARCH_TAGS[product.name] ?? []),
+    ...compoundCodes(product.name, product.pack),
+    ...packSearchTags(product.pack),
     ...(cat?.tags ?? []),
+    ...(cat?.searchTags ?? []),
     extra,
+    product.isNew ? "new" : "",
   ].join(" ");
-  if (blob.toLowerCase().includes(raw)) return true;
-  const compact = normalizeSearch(raw);
-  return compact.length > 0 && normalizeSearch(blob).includes(compact);
+  const blobLower = blob.toLowerCase();
+  return tokens.every((token) => tokenMatchesBlob(token, blobLower));
 }
 
 export function searchProducts(query: string): Product[] {
@@ -516,6 +841,8 @@ export const LIST_META = {
     "Volume prices apply to each individual SKU. Only kits of the same product and the same strength count toward a better price. Different products are not added together.",
   testing:
     "Every lot is released only after in-house QC. Selected commercial lots are also submitted to independent laboratories, including Janoshik, Freedom Diagnostics, and other accredited facilities. Customers are encouraged to commission their own assay. Should verified results fall below specification, we will refund the order or replace the batch. Public certificates of analysis are available on request.",
+  oem:
+    "We produce private-label packaging in-house for B2B and bulk orders. Your logo can be printed on vial and box labels and stickers, and caps can be made in your color or branding.",
   research:
     "For laboratory research use only. Not for human or veterinary use, not for diagnostic procedures, and not a drug, food, or cosmetic.",
   contactEmail: "shenzhenpeptide@protonmail.com",

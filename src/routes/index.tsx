@@ -2,7 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { BackToTop } from "@/components/back-to-top";
 import { PriceListBody } from "@/components/price-list-body";
+import { QuoteTray } from "@/components/quote-tray";
 import { SiteFooter } from "@/components/site-footer";
+import { QuoteCartProvider } from "@/lib/quote-cart";
 
 export const Route = createFileRoute("/")({ component: Home });
 
@@ -12,17 +14,20 @@ function Home() {
   const [section, setSection] = useState("all");
 
   return (
-    <div className="min-h-screen">
-      <PriceListBody
-        query={query}
-        onQuery={setQuery}
-        highlightTier={tier}
-        onHighlight={setTier}
-        section={section}
-        onSection={setSection}
-      />
-      <SiteFooter />
-      <BackToTop />
-    </div>
+    <QuoteCartProvider>
+      <div className="min-h-screen">
+        <PriceListBody
+          query={query}
+          onQuery={setQuery}
+          highlightTier={tier}
+          onHighlight={setTier}
+          section={section}
+          onSection={setSection}
+        />
+        <SiteFooter />
+        <BackToTop />
+        <QuoteTray />
+      </div>
+    </QuoteCartProvider>
   );
 }
