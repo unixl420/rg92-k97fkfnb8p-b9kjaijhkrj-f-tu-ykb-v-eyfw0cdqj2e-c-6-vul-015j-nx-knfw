@@ -17,6 +17,7 @@ function useFabOffset() {
   const [bottom, setBottom] = useState(EDGE);
   useEffect(() => {
     const update = () => {
+      if (document.hidden) return;
       const footer = document.getElementById("site-footer");
       if (!footer) {
         setBottom(EDGE);
@@ -128,28 +129,40 @@ function StopAddingButton({ onStop }: { onStop: () => void }) {
 }
 
 export function BackToTop() {
-  const [showNav, setShowNav] = useState(false);
-  const [showCart, setShowCart] = useState(false);
+  const [show, setShow] = useState(false);
   const bottom = useFabOffset();
   const cart = useQuoteCart();
 
   useEffect(() => {
-    const update = () => {
-      setShowNav(window.scrollY > 600);
+    let done = false;
+    let tick = 0;
+    const reveal = () => {
+      if (done || document.hidden) return;
       const finder = document.getElementById("peptide-finder");
-      const reached = finder ? finder.getBoundingClientRect().top <= 96 : window.scrollY > 600;
-      setShowCart(reached || cart.picking || cart.count > 0);
+      const reached = finder
+        ? finder.getBoundingClientRect().top <= window.innerHeight - 24
+        : window.scrollY > 80;
+      if (reached || window.scrollY > 80 || cart.picking || cart.count > 0) {
+        done = true;
+        setShow(true);
+        window.clearInterval(tick);
+        window.removeEventListener("scroll", reveal);
+        window.removeEventListener("resize", reveal);
+      }
     };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+    reveal();
+    tick = window.setInterval(reveal, 160);
+    window.addEventListener("scroll", reveal, { passive: true });
+    window.addEventListener("resize", reveal);
     return () => {
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
+      window.clearInterval(tick);
+      window.removeEventListener("scroll", reveal);
+      window.removeEventListener("resize", reveal);
     };
   }, [cart.picking, cart.count]);
 
   const fabBottom = `calc(${bottom}px + env(safe-area-inset-bottom, 0px))`;
+  const showCart = show || cart.picking || cart.count > 0;
 
   return (
     <>
@@ -183,7 +196,7 @@ export function BackToTop() {
         </div>
       ) : null}
 
-      {showNav ? (
+      {show ? (
         <div
           className="glass-fab-stack no-print fixed z-40 flex flex-col gap-2.5"
           style={{

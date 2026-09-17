@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 const ASSAYS = [
@@ -20,11 +21,42 @@ export function AssayPills() {
             item.tone,
           )}
         >
-          <AssayFx kind={item.kind} />
+          <VisibleFx>
+            <AssayFx kind={item.kind} />
+          </VisibleFx>
           <span className="relative z-10">{item.label}</span>
         </li>
       ))}
     </ul>
+  );
+}
+
+function VisibleFx({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const apply = (visible: boolean) => setOn(visible && !document.hidden);
+    const io = new IntersectionObserver(([entry]) => apply(entry.isIntersecting), {
+      rootMargin: "120px",
+    });
+    io.observe(el);
+    const onVis = () => {
+      if (document.hidden) setOn(false);
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      io.disconnect();
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
+  return (
+    <span ref={ref} className="pointer-events-none absolute inset-0">
+      {on ? children : null}
+    </span>
   );
 }
 

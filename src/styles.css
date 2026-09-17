@@ -23,14 +23,14 @@
   --color-assay-related: #8a5a28;
   --color-assay-solvent: #3d5c7a;
   --color-assay-micro: #2d6b4f;
-  --font-display: "Inter", sans-serif;
-  --font-sans: "Inter", sans-serif;
-  --font-mono: "Inter", monospace;
-  --radius-sm: 5.7px;
-  --radius-md: 9.5px;
-  --radius-lg: 15.2px;
-  --radius-xl: 22.8px;
-  --radius-2xl: 15.2px;
+  --font-display: ui-sans-serif, system-ui, "Inter", sans-serif;
+  --font-sans: ui-sans-serif, system-ui, "Inter", sans-serif;
+  --font-mono: ui-sans-serif, system-ui, "Inter", monospace;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 28px;
   --min-width-table: 40rem;
 }
 
@@ -597,6 +597,23 @@
   height: 8px;
   margin-top: 8px;
   animation: cell-pulse 2.2s ease-in-out infinite 0.4s;
+}
+
+.compound-block {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 280px;
+}
+
+html.tab-hidden .assay-fx,
+html.tab-hidden .assay-fx *,
+html.tab-hidden .hplc-line,
+html.tab-hidden .hplc-drop,
+html.tab-hidden .ms-circle,
+html.tab-hidden .wave,
+html.tab-hidden .rel-dot,
+html.tab-hidden .vap,
+html.tab-hidden .cell {
+  animation-play-state: paused !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

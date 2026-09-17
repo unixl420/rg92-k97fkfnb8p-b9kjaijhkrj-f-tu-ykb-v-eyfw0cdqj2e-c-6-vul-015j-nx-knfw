@@ -1,10 +1,11 @@
 import { AddToQuote } from "@/components/add-to-quote";
-import { useEffect, useRef, useState } from "react";
+import { groupIsOutOfStock, OutOfStockFold } from "@/components/out-of-stock-fold";
+import { memo, useEffect, useRef, useState } from "react";
 import { categoryById, groupByName, type Product } from "@/lib/catalog";
 import { VOLUME_TIERS } from "@/lib/pricing";
 import { cn, usd } from "@/lib/utils";
 
-export function MobileCategoryList({
+export const MobileCategoryList = memo(function MobileCategoryList({
   products,
   highlightTier,
 }: {
@@ -20,6 +21,7 @@ export function MobileCategoryList({
     let raf = 0;
     const update = () => {
       raf = 0;
+      if (document.hidden) return;
       let current: string | null = null;
       for (const group of groups) {
         const el = refs.current.get(group.name);
@@ -73,14 +75,41 @@ export function MobileCategoryList({
         </div>
       </div>
 
-      {groups.map((group) => (
+      {groups.map((group) => {
+        const oos = groupIsOutOfStock(group.items);
+        const body = group.items.map((product, i) => (
+          <MobileStrength
+            key={product.id}
+            product={product}
+            highlightTier={highlightTier}
+            accent={accent}
+            lined={i > 0}
+            oos={oos}
+          />
+        ));
+        if (oos) {
+          return (
+            <div
+              key={group.name}
+              ref={(node) => {
+                if (node) refs.current.set(group.name, node);
+                else refs.current.delete(group.name);
+              }}
+            >
+              <OutOfStockFold name={group.name} headerNote={group.items[0]?.headerNote} accent={accent}>
+                {body}
+              </OutOfStockFold>
+            </div>
+          );
+        }
+        return (
         <section
           key={group.name}
           ref={(node) => {
             if (node) refs.current.set(group.name, node);
             else refs.current.delete(group.name);
           }}
-          className="overflow-hidden rounded-xl border border-line bg-card"
+          className="compound-block overflow-hidden rounded-xl border border-line bg-card"
         >
           <div
             className="flex flex-wrap items-center justify-between gap-2 px-[26px] py-3.5 text-white"
@@ -93,53 +122,48 @@ export function MobileCategoryList({
               </span>
             ) : null}
           </div>
-          <div>
-            {group.items.map((product, i) => (
-              <MobileStrength
-                key={product.id}
-                product={product}
-                highlightTier={highlightTier}
-                accent={accent}
-                lined={i > 0}
-              />
-            ))}
-          </div>
+          <div>{body}</div>
         </section>
-      ))}
+        );
+      })}
     </div>
   );
-}
+});
 
 function MobileStrength({
   product,
   highlightTier,
   accent,
   lined,
+  oos = false,
 }: {
   product: Product;
   highlightTier: number;
   accent: string;
   lined: boolean;
+  oos?: boolean;
 }) {
   return (
     <div
       className="px-[26px] py-5"
       style={lined ? { borderTop: `1px solid ${accent}2e` } : undefined}
     >
-      <p className="flex items-center text-lg font-semibold" style={{ color: accent }}>
-        <AddToQuote product={product} accent={accent} />
-        {product.pack}
-        {product.unitNote ? (
-          <span className="ml-2 text-sm font-normal text-muted">{product.unitNote}</span>
-        ) : null}
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="min-w-0 text-lg font-semibold" style={{ color: accent }}>
+          {product.pack}
+          {product.unitNote ? (
+            <span className="ml-2 text-sm font-normal text-muted">{product.unitNote}</span>
+          ) : null}
+        </p>
+        {oos ? null : <AddToQuote product={product} accent={accent} />}
+      </div>
       {product.prices ? (
         <ul
           className="mt-3 overflow-hidden rounded-lg border"
           style={{ borderColor: `${accent}33` }}
         >
           {VOLUME_TIERS.map((tier, i) => {
-            const active = highlightTier === tier.id;
+            const active = !oos && highlightTier === tier.id;
             return (
               <li
                 key={tier.id}

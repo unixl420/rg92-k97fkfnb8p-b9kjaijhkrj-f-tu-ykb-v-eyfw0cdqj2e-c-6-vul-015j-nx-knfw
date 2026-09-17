@@ -1,4 +1,5 @@
 import { AddToQuote } from "@/components/add-to-quote";
+import { groupIsOutOfStock, OutOfStockFold } from "@/components/out-of-stock-fold";
 import { categoryById, groupByName, type Product } from "@/lib/catalog";
 import { VOLUME_TIERS } from "@/lib/pricing";
 import { cn, usd } from "@/lib/utils";
@@ -15,22 +16,54 @@ export function CategoryTable({
 
   return (
     <div className="space-y-4">
-      {groups.map((group) => (
-        <div
-          key={group.name}
-          className="overflow-hidden rounded-xl border border-line print:break-inside-avoid"
-        >
+      {groups.map((group) => {
+        const oos = groupIsOutOfStock(group.items);
+        const table = (
+          <CompoundTable group={group} highlightTier={highlightTier} accent={accent} oos={oos} />
+        );
+        if (oos) {
+          return (
+            <OutOfStockFold key={group.name} name={group.name} headerNote={group.items[0]?.headerNote} accent={accent}>
+              {table}
+            </OutOfStockFold>
+          );
+        }
+        return (
           <div
-            className="flex flex-wrap items-center justify-between gap-2 px-[26px] py-3.5 text-white"
-            style={{ backgroundColor: accent }}
+            key={group.name}
+            className="compound-block overflow-hidden rounded-xl border border-line print:break-inside-avoid"
           >
-            <h3 className="text-lg font-bold">{group.name}</h3>
-            {group.items[0]?.headerNote ? (
-              <span className="shrink-0 rounded-full bg-paper/20 px-3 py-1 text-sm font-semibold">
-                {group.items[0].headerNote}
-              </span>
-            ) : null}
+            <div
+              className="flex flex-wrap items-center justify-between gap-2 px-[26px] py-3.5 text-white"
+              style={{ backgroundColor: accent }}
+            >
+              <h3 className="text-lg font-bold">{group.name}</h3>
+              {group.items[0]?.headerNote ? (
+                <span className="shrink-0 rounded-full bg-paper/20 px-3 py-1 text-sm font-semibold">
+                  {group.items[0].headerNote}
+                </span>
+              ) : null}
+            </div>
+            {table}
           </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CompoundTable({
+  group,
+  highlightTier,
+  accent,
+  oos,
+}: {
+  group: { name: string; items: Product[] };
+  highlightTier: number;
+  accent: string;
+  oos: boolean;
+}) {
+  return (
           <div className="overflow-x-auto print:overflow-visible">
             <table className="w-full min-w-table border-collapse text-base print:min-w-0 print:text-sm">
               <thead>
@@ -46,11 +79,11 @@ export function CategoryTable({
                       key={tier.id}
                       className={cn(
                         "px-4 py-3 text-right font-semibold tabular-nums",
-                        highlightTier === tier.id && "text-white",
+                        !oos && highlightTier === tier.id && "text-white",
                       )}
                       style={{
                         borderBottom: `1px solid ${accent}33`,
-                        ...(highlightTier === tier.id ? { backgroundColor: accent } : {}),
+                        ...(!oos && highlightTier === tier.id ? { backgroundColor: accent } : {}),
                       }}
                     >
                       <span className="block leading-tight">{tier.label}</span>
@@ -66,17 +99,21 @@ export function CategoryTable({
                 {group.items.map((p, i) => (
                   <tr key={p.id} className={i % 2 === 0 ? "bg-card" : "bg-paper-deep/80"}>
                     <td
-                      className="flex items-center px-[26px] py-3 font-semibold"
+                      className="px-[26px] py-2.5"
                       style={{
                         color: accent,
                         borderTop: i === 0 ? undefined : `1px solid ${accent}26`,
                       }}
                     >
-                      <AddToQuote product={p} accent={accent} />
-                      {p.pack}
-                      {p.unitNote ? (
-                        <span className="ml-2 text-sm font-normal text-muted">{p.unitNote}</span>
-                      ) : null}
+                      <div className="flex min-w-[11rem] items-center justify-between gap-3">
+                        <span className="font-semibold">
+                          {p.pack}
+                          {p.unitNote ? (
+                            <span className="ml-2 text-sm font-normal text-muted">{p.unitNote}</span>
+                          ) : null}
+                        </span>
+                        {oos ? null : <AddToQuote product={p} accent={accent} compact />}
+                      </div>
                     </td>
                     {p.prices
                       ? p.prices.map((price, idx) => (
@@ -84,13 +121,13 @@ export function CategoryTable({
                             key={idx}
                             className={cn(
                               "px-4 py-3 text-right tabular-nums",
-                              highlightTier === idx && "font-bold",
+                              !oos && highlightTier === idx && "font-bold",
                             )}
                             style={{
                               borderTop: i === 0 ? undefined : `1px solid ${accent}26`,
-                              ...(highlightTier === idx
+                              ...(!oos && highlightTier === idx
                                 ? { backgroundColor: `${accent}1a`, color: accent }
-                                : {}),
+                                : { color: oos ? "#5a6778" : undefined }),
                             }}
                           >
                             {usd(price)}
@@ -113,8 +150,5 @@ export function CategoryTable({
               </tbody>
             </table>
           </div>
-        </div>
-      ))}
-    </div>
   );
 }

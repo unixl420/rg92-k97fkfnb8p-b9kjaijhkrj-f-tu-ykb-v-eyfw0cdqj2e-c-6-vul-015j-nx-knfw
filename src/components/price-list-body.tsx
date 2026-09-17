@@ -1,9 +1,9 @@
 import { Factory, FlaskConical, Package, Palette, Search, ShieldCheck, Sticker } from "lucide-react";
-import { AddToQuote } from "@/components/add-to-quote";
 import { AssayPills } from "@/components/assay-pills";
 import { CategoryTable } from "@/components/category-table";
 import { ContactUsButton } from "@/components/contact-us-button";
 import { GuaranteeStrip } from "@/components/guarantee-strip";
+import { LazyBody } from "@/components/lazy-body";
 import { MobileCategoryList } from "@/components/mobile-price-card";
 import { VolumeModel } from "@/components/volume-model";
 import {
@@ -14,6 +14,7 @@ import {
   SPECIAL_ORDER_PRODUCTS,
   productMatches,
 } from "@/lib/catalog";
+import { useMdUp } from "@/lib/use-md-up";
 
 export function PriceListBody({
   query,
@@ -32,6 +33,7 @@ export function PriceListBody({
   onSection?: (id: string) => void;
   printable?: boolean;
 }) {
+  const mdUp = useMdUp();
   const q = query.trim();
   const grouped = CATEGORIES.map((cat) => ({
     cat,
@@ -49,9 +51,21 @@ export function PriceListBody({
     q,
   );
   const showFactoryPair = printable || section === "all" || section === "special-order" || oemQuery;
-  const specials = showFactoryPair ? SPECIAL_ORDER_PRODUCTS : [];
-  const specialGroups = groupByName(specials);
+  const specials = SPECIAL_ORDER_PRODUCTS.filter((p) => {
+    if (!showFactoryPair) return false;
+    if (q && !oemQuery && !productMatches(p, q)) return false;
+    return true;
+  });
+  const specialByCategory = CATEGORIES.map((cat) => ({
+    cat,
+    groups: groupByName(specials.filter((p) => p.category === cat.id)),
+  })).filter((block) => block.groups.length);
+  const showSpecialBlock = showFactoryPair && (!q || specials.length > 0 || oemQuery);
   const matchCount = grouped.reduce((n, g) => n + groupByName(g.rows).length, 0);
+  const listedNames = new Set(
+    grouped.flatMap((g) => groupByName(g.rows).map((block) => block.name)),
+  );
+  const extraSpecials = groupByName(specials).filter((g) => !listedNames.has(g.name)).length;
   const totalCompounds = groupByName(PRODUCTS).length;
 
   return (
@@ -103,16 +117,7 @@ export function PriceListBody({
           >
             {LIST_META.company}
           </a>{" "}
-          (“SPB”) and{" "}
-          <a
-            href={LIST_META.sisterUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bold text-ink underline decoration-cobalt/40 underline-offset-2 hover:decoration-cobalt"
-          >
-            {LIST_META.sister}
-          </a>{" "}
-          (“GPB” or “G”) are the official storefront of China Biotech Group. We have been producing
+          (“SPB”) is the official storefront of China Biotech Group. We have been producing
           peptides continuously since 2010. We supply B2B partners around the world, and our
           storefront also serves individual research customers at factory-direct prices with a low
           minimum order. Every batch is tested in our own laboratory before release, and every order
@@ -165,8 +170,9 @@ export function PriceListBody({
           </form>
           {q ? (
             <p className="mt-2 text-base text-ink-soft">
-              Showing <strong>{matchCount}</strong> {matchCount === 1 ? "compound" : "compounds"}
-              {specials.length ? ` and ${specialGroups.length} special-order items` : ""} matching “{query}”
+              Showing <strong>{matchCount + extraSpecials}</strong>{" "}
+              {matchCount + extraSpecials === 1 ? "compound" : "compounds"}
+              {specials.length ? " including special-order sizes" : ""} matching “{query}”
               {grouped.length
                 ? ` in ${grouped.map((g) => g.cat.short).join(", ")}`
                 : ""}
@@ -197,7 +203,7 @@ export function PriceListBody({
             No peptides match “{query}”. Try a shorter name.
           </p>
         ) : (
-          grouped.map(({ cat, rows }) => {
+          grouped.map(({ cat, rows }, index) => {
             const compounds = groupByName(rows);
             return (
             <section key={cat.id} id={cat.id} className="section-anchor print-page">
@@ -216,14 +222,16 @@ export function PriceListBody({
               {printable ? (
                 <CategoryTable products={rows} highlightTier={highlightTier} />
               ) : (
-                <>
-                  <div className="md:hidden print:hidden">
-                    <MobileCategoryList products={rows} highlightTier={highlightTier} />
-                  </div>
-                  <div className="hidden md:block print:block">
+                <LazyBody
+                  eager={index < 3 || section !== "all" || Boolean(q)}
+                  minHeight={Math.min(rows.length * (mdUp ? 140 : 240), 2400)}
+                >
+                  {mdUp ? (
                     <CategoryTable products={rows} highlightTier={highlightTier} />
-                  </div>
-                </>
+                  ) : (
+                    <MobileCategoryList products={rows} highlightTier={highlightTier} />
+                  )}
+                </LazyBody>
               )}
             </section>
             );
@@ -231,7 +239,7 @@ export function PriceListBody({
         )}
       </div>
 
-      {showFactoryPair ? (
+      {showSpecialBlock ? (
         <>
         <section
           id="special-order"
@@ -258,20 +266,35 @@ export function PriceListBody({
             Ask our representative for a factory quote.
           </p>
           <p className="sr-only">quote · MOQ 100 kits · make-to-order</p>
-          <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            {specialGroups.map((group) => (
-              <article key={group.name} className="rounded-lg border border-cobalt/20 bg-card px-[22px] py-4">
-                <p className="font-semibold">{group.name}</p>
-                <p className="mt-1 flex flex-wrap items-center gap-x-1 gap-y-2 text-base text-ink-soft">
-                  {group.items.map((p, i) => (
-                    <span key={p.id} className="inline-flex items-center">
-                      {i > 0 ? <span className="mr-1">·</span> : null}
-                      <AddToQuote product={p} accent="#1b4f8a" />
-                      {p.pack}
-                    </span>
-                  ))}
+          <div className="mt-5 space-y-5">
+            {specialByCategory.map((block) => (
+              <div key={block.cat.id}>
+                <p className="mb-2 text-xs font-bold uppercase tracking-wide text-cobalt/80">
+                  {block.cat.short}
                 </p>
-              </article>
+                <div className="overflow-hidden rounded-xl border border-cobalt/20 bg-card">
+                  {block.groups.map((group, i) => (
+                    <div
+                      key={group.name}
+                      className={`flex flex-col gap-2 px-[22px] py-4 sm:flex-row sm:items-center sm:justify-between ${
+                        i ? "border-t border-cobalt/15" : ""
+                      }`}
+                    >
+                      <p className="font-semibold">{group.name}</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {group.items.map((p) => (
+                          <span
+                            key={p.id}
+                            className="rounded-full bg-cobalt/10 px-2.5 py-1 text-sm font-medium text-cobalt"
+                          >
+                            {p.pack}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </section>

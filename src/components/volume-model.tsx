@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Check, MousePointerClick } from "lucide-react";
 import { VOLUME_TIERS } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
+import { useMdUp } from "@/lib/use-md-up";
 
 const PLAIN = [
   "Listed starting price",
@@ -33,6 +34,7 @@ export function VolumeModel({
   onSelect?: (i: number) => void;
 }) {
   const interactive = Boolean(onSelect);
+  const mdUp = useMdUp();
 
   return (
     <section className="overflow-hidden rounded-xl border-2 border-cobalt/30 bg-card">
@@ -52,7 +54,8 @@ export function VolumeModel({
         </p>
       </div>
 
-      <div className="md:hidden print:hidden">
+      {!mdUp ? (
+      <div>
         {VOLUME_TIERS.map((tier) => {
           const active = highlightTier === tier.id;
           const cls = cn(
@@ -96,8 +99,10 @@ export function VolumeModel({
           );
         })}
       </div>
+      ) : null}
 
-      <div className="hidden md:grid md:grid-cols-5 print:grid print:grid-cols-5">
+      {mdUp ? (
+      <div className="grid grid-cols-5">
         {VOLUME_TIERS.map((tier, index) => {
           const active = highlightTier === tier.id;
           const inner: ReactNode = (
@@ -146,6 +151,7 @@ export function VolumeModel({
           );
         })}
       </div>
+      ) : null}
     </section>
   );
 }

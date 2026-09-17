@@ -1,6 +1,7 @@
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/lib/auth/provider";
 import { PreviewHostBridge } from "@/components/preview-host-bridge";
+import { TabVisibility } from "@/components/tab-visibility";
 import appCss from "../styles.css?url";
 
 import { currentListPeriod } from "@/lib/catalog";
@@ -30,10 +31,6 @@ export const Route = createRootRoute({
       { rel: "manifest", href: "/__grok/manifest.webmanifest" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
-      },
     ],
   }),
   component: () => (
@@ -43,6 +40,7 @@ export const Route = createRootRoute({
       </head>
       <body className="min-h-screen bg-paper font-sans text-ink">
         <PreviewHostBridge />
+        <TabVisibility />
         <AuthProvider>
           <Outlet />
         </AuthProvider>

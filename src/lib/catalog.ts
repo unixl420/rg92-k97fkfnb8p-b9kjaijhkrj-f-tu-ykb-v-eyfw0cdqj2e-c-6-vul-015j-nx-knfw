@@ -1,6 +1,13 @@
 import { slugify } from "./utils";
 import { volumeTiers, type PriceTiers } from "./pricing";
 
+/**
+ * Hidden OFF switch. Add a compound's exact catalog name to fold its table
+ * into the Out of stock pill. Remove the name to turn it back on.
+ */
+export const OUT_OF_STOCK_COMPOUNDS = new Set<string>(["L-Carnitine"]);
+
+
 export type CategoryId =
   | "metabolic"
   | "recovery"
@@ -24,6 +31,7 @@ export type Product = {
   prices: PriceTiers | null;
   specialOrder?: boolean;
   isNew?: boolean;
+  outOfStock?: boolean;
   excludeFromVolume?: boolean;
   unitNote?: string;
   headerNote?: string;
@@ -312,9 +320,19 @@ const COMPOUND_SEARCH_TAGS: Record<string, string[]> = {
   VIP: ["vasoactive intestinal peptide", "aviptadil", "pulmonary", "lung", "immune"],
   Dermorphin: ["opioid peptide", "mu agonist", "analgesia research", "pain research"],
   "TGF-DES": ["tgf", "transforming growth", "matrix", "ecm"],
-  HMG: ["hmg", "menotropin", "fsh", "lh", "menopur", "fertility"],
-  "LL-37": ["cathelicidin", "antimicrobial", "ll37", "innate defense"],
-  "Etelcalcetide Hydrochloride": ["etelcalcetide", "parsabiv", "calcimimetic", "pth", "calcium"],
+  HMG: [
+    "hmg", "hMG", "menotropin", "menotrophin", "hmg-hp", "human menopausal gonadotropin",
+    "fsh", "lh", "menopur", "fertility", "75iu", "75 iu", "gonadotropin",
+  ],
+  "LL-37": [
+    "ll37", "ll 37", "cathelicidin", "camp", "hcap18", "hcap-18", "antimicrobial",
+    "antimicrobial peptide", "amp", "innate defense", "innate immunity",
+  ],
+  "Etelcalcetide Hydrochloride": [
+    "etelcalcetide", "etelcalcetide hcl", "etelcalcetide hydrochloride", "hcl",
+    "parsabiv", "amg416", "amg-416", "velcalcetide", "calcimimetic", "pth",
+    "calcium", "1g", "2g", "1 g", "2 g", "gram",
+  ],
 };
 
 const COMPOUND_ABBREVS: Record<string, string[]> = {
@@ -422,9 +440,11 @@ const COMPOUND_ABBREVS: Record<string, string[]> = {
   VIP: ["vip"],
   Dermorphin: ["derm", "drm"],
   "TGF-DES": ["tgfdes", "tgf", "tgf-des"],
-  HMG: ["hmg", "hmg-"],
-  "LL-37": ["ll37", "ll-37"],
-  "Etelcalcetide Hydrochloride": ["etel", "etelcalcetide"],
+  HMG: ["hmg", "hmg-hp", "hmghp", "menotropin", "menotrophin"],
+  "LL-37": ["ll37", "ll-37", "ll 37", "camp", "hcap18"],
+  "Etelcalcetide Hydrochloride": [
+    "etel", "etelcalcetide", "etelhcl", "parsabiv", "amg416", "amg-416", "velcalcetide",
+  ],
 };
 
 function doseFromPack(pack: string): string | null {
@@ -494,6 +514,7 @@ type Draft = {
   prices: PriceTiers | null;
   specialOrder?: boolean;
   isNew?: boolean;
+  outOfStock?: boolean;
   excludeFromVolume?: boolean;
   unitNote?: string;
   headerNote?: string;
@@ -715,21 +736,25 @@ const DRAFTS: Draft[] = [
   item("Dermorphin", "5mg", "specialty", [58, 51, 44, 36, 30]),
   item("TGF-DES", "2mg", "specialty", [150, 131, 112, 94, 75]),
 
-  item("Retatrutide", "5mg", "metabolic", null, { specialOrder: true }),
-  item("Retatrutide", "15mg", "metabolic", null, { specialOrder: true }),
-  item("Retatrutide", "100mg", "metabolic", null, { specialOrder: true }),
-  item("Tirzepatide", "5mg", "metabolic", null, { specialOrder: true }),
-  item("Tirzepatide", "15mg", "metabolic", null, { specialOrder: true }),
-  item("Tirzepatide", "100mg", "metabolic", null, { specialOrder: true }),
-  item("Tirzepatide", "120mg", "metabolic", null, { specialOrder: true }),
-  item("HMG", "75iu", "sexual", null, { specialOrder: true }),
-  item("LL-37", "10mg", "specialty", null, { specialOrder: true }),
-  item("Etelcalcetide Hydrochloride", "1g / 2g", "specialty", null, { specialOrder: true }),
+  item("Retatrutide", "5mg", "metabolic", null, { specialOrder: true, tags: ["rt5", "reta5", "reta 5mg"] }),
+  item("Retatrutide", "15mg", "metabolic", null, { specialOrder: true, tags: ["rt15", "reta15", "reta 15mg"] }),
+  item("Retatrutide", "100mg", "metabolic", null, { specialOrder: true, tags: ["rt100", "reta100", "reta 100mg"] }),
+  item("Tirzepatide", "5mg", "metabolic", null, { specialOrder: true, tags: ["tz5", "tirz5", "tirz 5mg"] }),
+  item("Tirzepatide", "15mg", "metabolic", null, { specialOrder: true, tags: ["tz15", "tirz15", "tirz 15mg"] }),
+  item("Tirzepatide", "100mg", "metabolic", null, { specialOrder: true, tags: ["tz100", "tirz100", "tirz 100mg"] }),
+  item("Tirzepatide", "120mg", "metabolic", null, { specialOrder: true, tags: ["tz120", "tirz120", "tirz 120mg"] }),
+  item("HMG", "75iu", "sexual", null, { specialOrder: true, tags: ["hmg75", "75iu", "menotropin"] }),
+  item("LL-37", "10mg", "specialty", null, { specialOrder: true, tags: ["ll37", "ll-37", "cathelicidin"] }),
+  item("Etelcalcetide Hydrochloride", "1g / 2g", "specialty", null, {
+    specialOrder: true,
+    tags: ["etel", "etelcalcetide", "1g", "2g", "parsabiv", "hcl"],
+  }),
 ];
 
 export const PRODUCTS: Product[] = DRAFTS.map((d) => ({
   ...d,
   id: slugify(`${d.name}-${d.pack}`),
+  outOfStock: Boolean(d.outOfStock) || OUT_OF_STOCK_COMPOUNDS.has(d.name),
 }));
 
 export const STANDARD_PRODUCTS = PRODUCTS.filter((p) => !p.specialOrder);
@@ -788,6 +813,7 @@ export function productMatches(product: Product, query: string): boolean {
     ...(cat?.searchTags ?? []),
     extra,
     product.isNew ? "new" : "",
+    product.outOfStock ? "out of stock oos unavailable" : "",
   ].join(" ");
   const blobLower = blob.toLowerCase();
   return tokens.every((token) => tokenMatchesBlob(token, blobLower));
@@ -825,14 +851,12 @@ export const LIST_META = {
   company: "Shenzhen Peptide Biotechnology Co., Ltd.",
   companyUrl: "https://www.shenzhenpeptide.com",
   group: "China Biotech Group",
-  sister: "Guangzhou Peptide Biotechnology Co., Ltd.",
-  sisterUrl: "https://www.guangzhoupeptide.com",
   get month() {
     return currentListPeriod().label;
   },
   kitLegend: "1 Kit = 10 Vials",
   intro:
-    'Shenzhen Peptide Biotechnology Co., Ltd. (“SPB”) and Guangzhou Peptide Biotechnology Co., Ltd. (“GPB” or “G”) are the official storefront of China Biotech Group. We have been producing peptides continuously since 2010. We supply B2B partners around the world, and our storefront also serves individual research customers at factory-direct prices with a low minimum order. Every batch is tested in our own laboratory before release, and every order is protected by our written Quality Guarantee and Shipping Guarantee.',
+    'Shenzhen Peptide Biotechnology Co., Ltd. (“SPB”) is the official storefront of China Biotech Group. We have been producing peptides continuously since 2010. We supply B2B partners around the world, and our storefront also serves individual research customers at factory-direct prices with a low minimum order. Every batch is tested in our own laboratory before release, and every order is protected by our written Quality Guarantee and Shipping Guarantee.',
   quality:
     "We encourage you to test your received batch at any reputable laboratory. Should independent results fall below specification, we will provide a full refund or a replacement batch. Further detail is below; contact us for a public COA.",
   shipping:

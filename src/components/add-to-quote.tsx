@@ -3,37 +3,48 @@ import { type Product } from "@/lib/catalog";
 import { useQuoteCartOptional } from "@/lib/quote-cart";
 import { cn } from "@/lib/utils";
 
-export function AddToQuote({ product, accent }: { product: Product; accent?: string }) {
+export function AddToQuote({
+  product,
+  accent,
+  compact = false,
+}: {
+  product: Product;
+  accent?: string;
+  compact?: boolean;
+}) {
   const cart = useQuoteCartOptional();
   if (!cart?.picking) return null;
   const qty = cart.lineQty(product.id);
   const color = accent ?? "#1b4f8a";
+  const added = qty > 0;
 
   return (
     <button
       type="button"
-      aria-label={`Add ${product.name} ${product.pack} to quote`}
+      aria-label={`Add ${product.name} ${product.pack} to cart`}
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
         cart.add(product);
       }}
       className={cn(
-        "relative mr-2 inline-flex size-7 shrink-0 items-center justify-center rounded-full border print:hidden",
-        qty ? "text-paper" : "bg-paper",
+        "relative inline-flex shrink-0 items-center justify-center gap-1 rounded-full font-semibold print:hidden transition-[filter,transform] hover:brightness-95 active:scale-95",
+        compact ? "h-8 px-2.5 text-xs" : "h-9 px-3 text-sm",
       )}
       style={{
-        borderColor: color,
-        backgroundColor: qty ? color : undefined,
-        color: qty ? "#fff" : color,
+        border: `1px solid ${color}`,
+        backgroundColor: added ? color : `${color}14`,
+        color: added ? "#fff" : color,
       }}
     >
-      <Plus className="size-3.5" strokeWidth={2.5} />
-      {qty ? (
-        <span className="absolute -right-1.5 -top-1.5 inline-flex min-w-4 rounded-full bg-ink px-1 text-[10px] font-bold leading-4 text-paper">
-          {qty}
-        </span>
-      ) : null}
+      {added ? (
+        <span>{qty} kit{qty === 1 ? "" : "s"}</span>
+      ) : (
+        <>
+          <Plus className={compact ? "size-3" : "size-3.5"} strokeWidth={2.5} />
+          Add
+        </>
+      )}
     </button>
   );
 }
