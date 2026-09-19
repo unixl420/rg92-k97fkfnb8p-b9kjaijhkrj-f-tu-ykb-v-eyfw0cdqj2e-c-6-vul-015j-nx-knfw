@@ -12,7 +12,7 @@ const QUALITY = {
     <>
       See{" "}
       <a href="#testing" className="font-semibold text-cobalt underline underline-offset-2">
-        Testing & written guarantees
+        testing & written guarantees
       </a>{" "}
       below, or contact us for a public COA.
     </>
