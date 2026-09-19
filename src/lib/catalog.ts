@@ -5,7 +5,7 @@ import { volumeTiers, type PriceTiers } from "./pricing";
  * Hidden OFF switch. Add a compound's exact catalog name to fold its table
  * into the Out of stock pill. Remove the name to turn it back on.
  */
-export const OUT_OF_STOCK_COMPOUNDS = new Set<string>(["L-Carnitine"]);
+export const OUT_OF_STOCK_COMPOUNDS = new Set<string>(["L-Carnitine", "Selank"]);
 
 
 export type CategoryId =
