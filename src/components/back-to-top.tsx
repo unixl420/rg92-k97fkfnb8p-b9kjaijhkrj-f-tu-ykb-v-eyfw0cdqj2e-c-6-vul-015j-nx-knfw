@@ -221,7 +221,10 @@ function GlassSearch({
         >
           <Search className="size-5" strokeWidth={2} />
           {query.trim() ? (
-            <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-paper" />
+            <span
+              className="glass-indicator absolute right-1.5 top-1.5 size-2 rounded-full"
+              aria-hidden
+            />
           ) : null}
         </button>
       )}
@@ -320,7 +323,7 @@ export function BackToTop({
                 {cart.picking ? <PenLine className="size-5" /> : <Plus className="size-5" />}
               </span>
               {cart.count ? (
-                <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-paper px-1 text-[10px] font-bold leading-5 text-cobalt">
+                <span className="glass-indicator absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-bold leading-5 text-cobalt">
                   {cart.count}
                 </span>
               ) : null}
