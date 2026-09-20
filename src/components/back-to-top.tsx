@@ -122,8 +122,7 @@ function CartFabHint({
       role="status"
       className={cn("glass-fab-tip", leaving && "is-leaving")}
     >
-      <span className="glass-fab-tip-caret" aria-hidden />
-      <span>Save your list and send it to us!</span>
+      <div className="glass-fab-tip-fill">Save your list and send it to us!</div>
     </div>
   );
 }
