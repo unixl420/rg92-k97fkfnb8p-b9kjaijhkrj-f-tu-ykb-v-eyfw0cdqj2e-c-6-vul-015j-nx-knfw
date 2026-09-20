@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp, PenLine, Plus, Search, X } from "lucide-react";
-import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
 import { useQuoteCart } from "@/lib/quote-cart";
 import { cn } from "@/lib/utils";
 
@@ -108,6 +108,31 @@ function PageScrollFab({
   );
 }
 
+const TAIL = 8;
+
+function speechBubblePath(width: number, height: number, tail = TAIL) {
+  const w = width + tail;
+  const h = height;
+  const r = Math.min(16, h / 2 - 1, (w - tail) / 2 - 1);
+  const mid = h / 2;
+  const wing = Math.min(7, Math.max(4, mid - r - 1));
+  const n = (value: number) => Number(value.toFixed(2));
+  return [
+    `M 0 ${n(mid)}`,
+    `L ${tail} ${n(mid - wing)}`,
+    `L ${tail} ${n(r)}`,
+    `A ${n(r)} ${n(r)} 0 0 1 ${n(tail + r)} 0`,
+    `L ${n(w - r)} 0`,
+    `A ${n(r)} ${n(r)} 0 0 1 ${n(w)} ${n(r)}`,
+    `L ${n(w)} ${n(h - r)}`,
+    `A ${n(r)} ${n(r)} 0 0 1 ${n(w - r)} ${n(h)}`,
+    `L ${n(tail + r)} ${n(h)}`,
+    `A ${n(r)} ${n(r)} 0 0 1 ${tail} ${n(h - r)}`,
+    `L ${tail} ${n(mid + wing)}`,
+    "Z",
+  ].join(" ");
+}
+
 function CartFabHint({
   visible,
   leaving,
@@ -115,14 +140,48 @@ function CartFabHint({
   visible: boolean;
   leaving: boolean;
 }) {
+  const root = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState({ w: 0, h: 0 });
+
+  useLayoutEffect(() => {
+    if (!visible) return;
+    const el = root.current;
+    if (!el) return;
+    const apply = () => {
+      const rect = el.getBoundingClientRect();
+      const w = Math.round(rect.width);
+      const h = Math.round(rect.height);
+      setBox((prev) => (prev.w === w && prev.h === h ? prev : { w, h }));
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [visible]);
+
   if (!visible) return null;
+
+  const d = box.w > 8 && box.h > 8 ? speechBubblePath(box.w, box.h) : "";
+
   return (
     <div
+      ref={root}
       id="quote-fab-tip"
       role="status"
       className={cn("glass-fab-tip", leaving && "is-leaving")}
     >
-      <div className="glass-fab-tip-fill">Save your list and send it to us!</div>
+      {d ? (
+        <svg
+          className="glass-fab-tip-shape"
+          width={box.w + TAIL}
+          height={box.h}
+          viewBox={`0 0 ${box.w + TAIL} ${box.h}`}
+          aria-hidden
+        >
+          <path d={d} />
+        </svg>
+      ) : null}
+      <span className="glass-fab-tip-copy">Save your list and send it to us!</span>
     </div>
   );
 }
