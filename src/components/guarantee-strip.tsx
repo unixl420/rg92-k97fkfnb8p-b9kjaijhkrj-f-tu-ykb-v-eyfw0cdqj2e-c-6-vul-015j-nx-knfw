@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { ChevronDown, ShieldCheck, Truck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useMdUp } from "@/lib/use-md-up";
 
 const QUALITY = {
   id: "quality" as const,
@@ -30,12 +29,10 @@ const SHIPPING = {
 export function GuaranteeStrip() {
   const [open, setOpen] = useState<(typeof QUALITY)["id"] | (typeof SHIPPING)["id"] | null>(null);
   const active = open === "quality" ? QUALITY : open === "shipping" ? SHIPPING : null;
-  const mdUp = useMdUp();
 
   return (
     <>
-      {!mdUp ? (
-      <div>
+      <div className="md:hidden">
         <div className="grid grid-cols-2 gap-2">
           <MobileGuaranteePill
             item={QUALITY}
@@ -55,13 +52,10 @@ export function GuaranteeStrip() {
           </div>
         ) : null}
       </div>
-      ) : null}
-      {mdUp ? (
-      <div className="grid grid-cols-2 items-stretch gap-4">
+      <div className="hidden grid-cols-2 items-stretch gap-4 md:grid">
         <GuaranteeCard item={QUALITY} tone="mist" />
         <GuaranteeCard item={SHIPPING} tone="paper" />
       </div>
-      ) : null}
     </>
   );
 }

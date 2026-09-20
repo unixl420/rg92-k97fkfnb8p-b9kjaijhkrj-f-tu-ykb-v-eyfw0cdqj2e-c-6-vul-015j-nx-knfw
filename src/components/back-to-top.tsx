@@ -108,6 +108,26 @@ function PageScrollFab({
   );
 }
 
+function CartFabHint({
+  visible,
+  leaving,
+}: {
+  visible: boolean;
+  leaving: boolean;
+}) {
+  if (!visible) return null;
+  return (
+    <div
+      id="quote-fab-tip"
+      role="status"
+      className={cn("glass-fab-tip", leaving && "is-leaving")}
+    >
+      <span className="glass-fab-tip-caret" aria-hidden />
+      <span>Save your list and send it to us!</span>
+    </div>
+  );
+}
+
 function StopAddingButton({ onStop }: { onStop: () => void }) {
   const [red, setRed] = useState(false);
 
@@ -222,6 +242,7 @@ export function BackToTop({
   onQuery?: (q: string) => void;
 }) {
   const [show, setShow] = useState(false);
+  const [tip, setTip] = useState<"in" | "out" | "gone">("in");
   const bottom = useFabOffset();
   const cart = useQuoteCart();
 
@@ -253,25 +274,44 @@ export function BackToTop({
     };
   }, [cart.picking, cart.count]);
 
+  useEffect(() => {
+    if (cart.picking || cart.count > 0) {
+      setTip("gone");
+      return;
+    }
+    if (tip !== "in") return;
+    const hide = window.setTimeout(() => setTip("out"), 30_000);
+    return () => window.clearTimeout(hide);
+  }, [cart.picking, cart.count, tip]);
+
+  useEffect(() => {
+    if (tip !== "out") return;
+    const gone = window.setTimeout(() => setTip("gone"), 220);
+    return () => window.clearTimeout(gone);
+  }, [tip]);
+
   const fabBottom = `calc(${bottom}px + env(safe-area-inset-bottom, 0px))`;
-  const showCart = show || cart.picking || cart.count > 0;
+  const showTip = tip !== "gone" && !cart.picking && cart.count === 0;
 
   return (
     <>
-      {showCart ? (
-        <div
-          className="glass-fab-stack no-print fixed z-40 flex flex-col items-center gap-2"
-          style={{
-            bottom: fabBottom,
-            left: "max(1rem, env(safe-area-inset-left, 0px))",
-          }}
-        >
-          {cart.picking ? <StopAddingButton onStop={cart.doneAdding} /> : null}
+      <div
+        className="glass-fab-stack no-print fixed z-40 flex flex-col items-center gap-2"
+        style={{
+          bottom: fabBottom,
+          left: "max(1rem, env(safe-area-inset-left, 0px))",
+        }}
+      >
+        {cart.picking ? <StopAddingButton onStop={cart.doneAdding} /> : null}
+        <div className="relative">
+          <CartFabHint visible={showTip} leaving={tip === "out"} />
           <button
             type="button"
             aria-label={cart.picking ? "Open cart" : "Start adding"}
+            aria-describedby={showTip ? "quote-fab-tip" : undefined}
             className={FAB}
             onClick={() => {
+              setTip("gone");
               if (cart.picking) cart.openTray();
               else cart.enablePicking();
             }}
@@ -286,7 +326,7 @@ export function BackToTop({
             ) : null}
           </button>
         </div>
-      ) : null}
+      </div>
 
       {show ? (
         <div
