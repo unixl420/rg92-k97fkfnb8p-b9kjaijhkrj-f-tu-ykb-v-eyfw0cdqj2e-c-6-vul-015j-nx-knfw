@@ -97,7 +97,9 @@ function CompoundTable({
                 </tr>
               </thead>
               <tbody>
-                {group.items.map((p, i) => (
+                {group.items.map((p, i) => {
+                  const rowOos = oos || Boolean(p.outOfStock);
+                  return (
                   <tr key={p.id} className={i % 2 === 0 ? "bg-card" : "bg-paper-deep/80"}>
                     <td
                       className="px-[26px] py-2.5"
@@ -113,7 +115,16 @@ function CompoundTable({
                             <span className="ml-2 text-sm font-normal text-muted">{p.unitNote}</span>
                           ) : null}
                         </span>
-                        {oos ? null : <AddToQuote product={p} accent={accent} compact />}
+                        {rowOos ? (
+                          <span
+                            className="rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide"
+                            style={{ backgroundColor: `${accent}22`, color: accent }}
+                          >
+                            Out of stock
+                          </span>
+                        ) : (
+                          <AddToQuote product={p} accent={accent} compact />
+                        )}
                       </div>
                     </td>
                     {p.prices
@@ -122,13 +133,13 @@ function CompoundTable({
                             key={idx}
                             className={cn(
                               "px-4 py-3 text-right tabular-nums",
-                              !oos && highlightTier === idx && "font-bold",
+                              !rowOos && highlightTier === idx && "font-bold",
                             )}
                             style={{
                               borderTop: i === 0 ? undefined : `1px solid ${accent}26`,
-                              ...(!oos && highlightTier === idx
+                              ...(!rowOos && highlightTier === idx
                                 ? { backgroundColor: `${accent}1a`, color: accent }
-                                : { color: oos ? "#5a6778" : undefined }),
+                                : { color: rowOos ? "#5a6778" : undefined }),
                             }}
                           >
                             {usd(price)}
@@ -147,7 +158,8 @@ function CompoundTable({
                           </td>
                         ))}
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>

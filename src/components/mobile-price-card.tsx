@@ -85,7 +85,7 @@ export const MobileCategoryList = memo(function MobileCategoryList({
             highlightTier={highlightTier}
             accent={accent}
             lined={i > 0}
-            oos={oos}
+            oos={oos || Boolean(product.outOfStock)}
           />
         ));
         if (oos) {
@@ -156,7 +156,16 @@ function MobileStrength({
             <span className="ml-2 text-sm font-normal text-muted">{product.unitNote}</span>
           ) : null}
         </p>
-        {oos ? null : <AddToQuote product={product} accent={accent} />}
+        {oos ? (
+          <span
+            className="rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide"
+            style={{ backgroundColor: `${accent}22`, color: accent }}
+          >
+            Out of stock
+          </span>
+        ) : (
+          <AddToQuote product={product} accent={accent} />
+        )}
       </div>
       {product.prices ? (
         <ul

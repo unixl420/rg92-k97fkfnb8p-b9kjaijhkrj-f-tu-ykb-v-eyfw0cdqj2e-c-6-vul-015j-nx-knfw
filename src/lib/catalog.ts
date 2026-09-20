@@ -643,7 +643,7 @@ const DRAFTS: Draft[] = [
   item("IGF-DES", "2mg", "growth", [48, 42, 36, 31, 24]),
 
   item("PT141", "10mg", "sexual", [67, 59, 51, 42, 34]),
-  item("Kisspeptin-10", "5mg", "sexual", [48, 42, 36, 31, 24]),
+  item("Kisspeptin-10", "5mg", "sexual", [48, 42, 36, 31, 24], { outOfStock: true }),
   item("Kisspeptin-10", "10mg", "sexual", [96, 84, 73, 61, 48]),
   item("Oxytocin Acetate", "2mg", "sexual", [20, 18, 15, 12, 10]),
   item("Oxytocin Acetate", "5mg", "sexual", [38, 34, 30, 24, 20]),
