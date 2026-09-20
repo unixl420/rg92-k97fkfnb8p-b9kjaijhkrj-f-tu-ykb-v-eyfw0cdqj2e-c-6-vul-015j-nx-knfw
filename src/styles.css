@@ -37,6 +37,7 @@
 :root {
   --glass-fill: color-mix(in srgb, var(--color-ink) 70%, transparent);
   --glass-stroke: color-mix(in srgb, var(--color-paper) 40%, transparent);
+  --glass-tip-fill: color-mix(in srgb, var(--color-ink) 70%, var(--color-paper) 30%);
 }
 
 @layer base {
@@ -182,7 +183,7 @@
   pointer-events: none;
   border-radius: 1rem;
   border: 1px solid var(--glass-stroke);
-  background: var(--glass-fill);
+  background: var(--glass-tip-fill);
   padding: 0.625rem 0.875rem;
   color: var(--color-paper);
   font-size: 0.875rem;
@@ -190,8 +191,6 @@
   line-height: 1.35;
   letter-spacing: -0.01em;
   box-shadow: 0 10px 28px color-mix(in srgb, var(--color-ink) 22%, transparent);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
   animation: glass-tip-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
 }
 .glass-fab-tip.is-leaving {
@@ -199,14 +198,25 @@
 }
 .glass-fab-tip-caret {
   position: absolute;
-  left: -5px;
+  left: 0;
   top: 50%;
-  width: 10px;
-  height: 10px;
-  transform: translateY(-50%) rotate(45deg);
-  border-left: 1px solid var(--glass-stroke);
-  border-bottom: 1px solid var(--glass-stroke);
-  background: var(--glass-fill);
+  z-index: 1;
+  width: 8px;
+  height: 14px;
+  transform: translate(calc(-100% + 2px), -50%);
+  background: var(--glass-tip-fill);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+.glass-fab-tip-caret::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: 1px;
+  bottom: -1px;
+  left: -1px;
+  z-index: -1;
+  background: var(--glass-stroke);
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
 }
 @keyframes glass-tip-in {
   from {
