@@ -4,10 +4,10 @@ import { useQuoteCart } from "@/lib/quote-cart";
 import { cn } from "@/lib/utils";
 
 const FAB =
-  "glass-fab relative inline-flex size-12 items-center justify-center rounded-full border border-paper/40 bg-ink/70 text-paper shadow-lg backdrop-blur-xl hover:bg-ink/85 sm:size-14";
+  "glass-fab relative inline-flex size-12 items-center justify-center rounded-full text-paper shadow-lg sm:size-14";
 
 const FAB_MINI =
-  "glass-fab glass-fab-x inline-flex size-8 items-center justify-center rounded-full border text-paper shadow-lg backdrop-blur-xl sm:size-9";
+  "glass-fab glass-fab-x inline-flex size-8 items-center justify-center rounded-full text-paper shadow-lg sm:size-9";
 
 const EDGE = 20;
 const GAP = 16;
@@ -140,12 +140,7 @@ function StopAddingButton({ onStop }: { onStop: () => void }) {
     <button
       type="button"
       aria-label="Stop adding"
-      className={cn(
-        FAB_MINI,
-        red
-          ? "border-red-100/45 bg-red-700/70 hover:bg-red-600/85"
-          : "border-paper/40 bg-ink/70",
-      )}
+      className={cn(FAB_MINI, red && "glass-fab-x-stop")}
       onClick={onStop}
     >
       <X className="size-3.5 sm:size-4" strokeWidth={2.5} />
@@ -188,7 +183,7 @@ function GlassSearch({
     <div
       ref={root}
       className={cn(
-        "glass-search flex h-12 items-center overflow-hidden rounded-full border border-paper/40 bg-ink/80 text-paper shadow-lg backdrop-blur-xl sm:h-14",
+        "glass-search flex h-12 items-center overflow-hidden rounded-full text-paper shadow-lg sm:h-14",
         open ? "glass-search-open pl-3.5 pr-1" : "justify-center",
       )}
     >
@@ -247,34 +242,37 @@ export function BackToTop({
   const cart = useQuoteCart();
 
   useEffect(() => {
-    let done = false;
-    let tick = 0;
-    const reveal = () => {
-      if (done || document.hidden) return;
-      const finder = document.getElementById("peptide-finder");
-      const reached = finder
-        ? finder.getBoundingClientRect().top <= window.innerHeight - 24
-        : window.scrollY > 80;
-      if (reached || window.scrollY > 80 || cart.picking || cart.count > 0) {
-        done = true;
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      if (document.hidden) return;
+      if (cart.count > 0) {
         setShow(true);
-        window.clearInterval(tick);
-        window.removeEventListener("scroll", reveal);
-        window.removeEventListener("resize", reveal);
+        return;
       }
+      const volume = document.getElementById("volume-pricing");
+      const reached = volume
+        ? volume.getBoundingClientRect().top <= 120
+        : window.scrollY > 220;
+      setShow((prev) => (prev === reached ? prev : reached));
     };
-    reveal();
-    tick = window.setInterval(reveal, 160);
-    window.addEventListener("scroll", reveal, { passive: true });
-    window.addEventListener("resize", reveal);
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    const tick = window.setInterval(update, 200);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
     return () => {
       window.clearInterval(tick);
-      window.removeEventListener("scroll", reveal);
-      window.removeEventListener("resize", reveal);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
     };
-  }, [cart.picking, cart.count]);
+  }, [cart.count]);
 
   useEffect(() => {
+    if (!show) return;
     if (cart.picking || cart.count > 0) {
       setTip("gone");
       return;
@@ -282,7 +280,7 @@ export function BackToTop({
     if (tip !== "in") return;
     const hide = window.setTimeout(() => setTip("out"), 30_000);
     return () => window.clearTimeout(hide);
-  }, [cart.picking, cart.count, tip]);
+  }, [show, cart.picking, cart.count, tip]);
 
   useEffect(() => {
     if (tip !== "out") return;
@@ -291,44 +289,47 @@ export function BackToTop({
   }, [tip]);
 
   const fabBottom = `calc(${bottom}px + env(safe-area-inset-bottom, 0px))`;
-  const showTip = tip !== "gone" && !cart.picking && cart.count === 0;
+  const showTip = show && tip !== "gone" && !cart.picking && cart.count === 0;
+  const showFabs = show || cart.count > 0;
 
   return (
     <>
-      <div
-        className="glass-fab-stack no-print fixed z-40 flex flex-col items-center gap-2"
-        style={{
-          bottom: fabBottom,
-          left: "max(1rem, env(safe-area-inset-left, 0px))",
-        }}
-      >
-        {cart.picking ? <StopAddingButton onStop={cart.doneAdding} /> : null}
-        <div className="relative">
-          <CartFabHint visible={showTip} leaving={tip === "out"} />
-          <button
-            type="button"
-            aria-label={cart.picking ? "Open cart" : "Start adding"}
-            aria-describedby={showTip ? "quote-fab-tip" : undefined}
-            className={FAB}
-            onClick={() => {
-              setTip("gone");
-              if (cart.picking) cart.openTray();
-              else cart.enablePicking();
-            }}
-          >
-            <span key={cart.picking ? "pen" : "plus"} className="glass-fab-icon">
-              {cart.picking ? <PenLine className="size-5" /> : <Plus className="size-5" />}
-            </span>
-            {cart.count ? (
-              <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-paper px-1 text-[10px] font-bold leading-5 text-cobalt">
-                {cart.count}
+      {showFabs ? (
+        <div
+          className="glass-fab-stack no-print fixed z-40 flex flex-col items-center gap-2"
+          style={{
+            bottom: fabBottom,
+            left: "max(1rem, env(safe-area-inset-left, 0px))",
+          }}
+        >
+          {cart.picking ? <StopAddingButton onStop={cart.doneAdding} /> : null}
+          <div className="relative">
+            <CartFabHint visible={showTip} leaving={tip === "out"} />
+            <button
+              type="button"
+              aria-label={cart.picking ? "Open cart" : "Start adding"}
+              aria-describedby={showTip ? "quote-fab-tip" : undefined}
+              className={FAB}
+              onClick={() => {
+                setTip("gone");
+                if (cart.picking) cart.openTray();
+                else cart.enablePicking();
+              }}
+            >
+              <span key={cart.picking ? "pen" : "plus"} className="glass-fab-icon">
+                {cart.picking ? <PenLine className="size-5" /> : <Plus className="size-5" />}
               </span>
-            ) : null}
-          </button>
+              {cart.count ? (
+                <span className="absolute -right-1 -top-1 inline-flex min-w-5 items-center justify-center rounded-full bg-paper px-1 text-[10px] font-bold leading-5 text-cobalt">
+                  {cart.count}
+                </span>
+              ) : null}
+            </button>
+          </div>
         </div>
-      </div>
+      ) : null}
 
-      {show ? (
+      {showFabs ? (
         <div
           className="glass-fab-stack no-print fixed z-40 flex flex-col items-end gap-2.5"
           style={{

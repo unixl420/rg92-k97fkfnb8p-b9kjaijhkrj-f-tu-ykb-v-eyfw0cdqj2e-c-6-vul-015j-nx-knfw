@@ -37,7 +37,7 @@ export const VolumeModel = memo(function VolumeModel({
   const mdUp = useMdUp();
 
   return (
-    <section className="overflow-hidden rounded-xl border-2 border-cobalt/30 bg-card">
+    <section id="volume-pricing" className="overflow-hidden rounded-xl border-2 border-cobalt/30 bg-card">
       <div className="border-b border-line bg-cobalt px-[26px] py-4 text-paper">
         <div className="flex items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-lg font-semibold">
